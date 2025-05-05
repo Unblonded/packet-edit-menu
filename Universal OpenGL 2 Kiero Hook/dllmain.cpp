@@ -48,23 +48,21 @@ std::vector<std::string> nearbyPlayers;
 
 std::string tunnelBlockStatus = "Unknown";
 
+bool autoCrystal = false;
+int crystalAttackTime = 0;
+int crystalPlaceTime = 0;
+bool cancelInteraction = false;
+bool showMenuInitialized = false;
+
 
 
 void RenderMain()
 {
+    if (!showMenu) showMenuInitialized = false;
     if (!showAll) return;
 
     ImVec2 windowSize = ImGui::GetIO().DisplaySize;
     ImGui::GetIO().FontGlobalScale = (windowSize.x / 1920.0f) * 0.85f;
-
-    /*if (showInfo) {
-		ImGui::SetNextWindowSize(ImVec2(425, 200), ImGuiCond_Once);
-        ImGui::Begin("Packet Edit - Unblonded");
-		ImGui::Text("Welcome, to Packet Edit By Unblonded!");
-        ImGui::Text("Usage: Just open chat to configure the menu!");
-		ImGui::Text("Enjoy!");
-        ImGui::End();
-    }*/
 
     if (showMenu) {
         ImGui::Begin("Packet Edit - Unblonded");
@@ -72,7 +70,17 @@ void RenderMain()
 		ImGui::Checkbox("Advanced ESP", &advEsp);
 		ImGui::Checkbox("Player Dig Safety", &checkPlayerAirSafety);
         ImGui::Checkbox("Straight Tunnel", &forwardTunnel);
+		ImGui::Checkbox("Auto Crystal", &autoCrystal);
+        ImGui::Checkbox("Interaction Canceler", &cancelInteraction);
         ImGui::End();
+
+        if (autoCrystal) {
+			ImGui::Begin("Auto Crystal");
+			ImGui::Text("Auto Crystal is enabled.");
+            ImGui::SliderInt("Attack Time (ms)", &crystalAttackTime, 5, 500);
+			ImGui::SliderInt("Place Time (ms)", &crystalPlaceTime, 5, 500);
+			ImGui::End();
+        }
 
         if (advEsp) {
             ImGui::Begin("Advanced ESP");
@@ -146,6 +154,11 @@ void RenderMain()
         ImGui::Begin("Tunneling Status");
         ImGui::Text(tunnelBlockStatus.c_str());
         ImGui::End();
+    }
+
+    if (showMenu && !showMenuInitialized) {
+        ImGui::SetWindowFocus(nullptr); // Remove focus from any window
+        showMenuInitialized = true;
     }
 }
 
@@ -231,6 +244,10 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                 config["checkPlayerAirSafety"] = checkPlayerAirSafety;
                 config["drawBlockTracer"] = drawBlockTracer;
                 config["forwardTunnel"] = forwardTunnel;
+				config["autoCrystal"] = autoCrystal;
+				config["crystalAttackTime"] = crystalAttackTime;
+				config["crystalPlaceTime"] = crystalPlaceTime;
+				config["cancelInteraction"] = cancelInteraction;
 
                 json espBlocksJson = json::array();
                 for (const auto& block : espBlockList) {
@@ -347,6 +364,9 @@ void saveSettings() {
     config["espSearchTime"] = espSearchTime;
     config["checkPlayerAirSafety"] = checkPlayerAirSafety;
     config["drawBlockTracer"] = drawBlockTracer;
+    config["crystalAttackTime"] = crystalAttackTime;
+	config["crystalPlaceTime"] = crystalPlaceTime;
+	config["cancelInteraction"] = cancelInteraction;
 
     json blocksJson = json::array();
     for (const auto& block : espBlockList) {
@@ -382,6 +402,9 @@ void loadSettings() {
         if (config.contains("espSearchTime")) espSearchTime = config["espSearchTime"].get<int>();
         if (config.contains("checkPlayerAirSafety")) checkPlayerAirSafety = config["checkPlayerAirSafety"].get<bool>();
         if (config.contains("drawBlockTracer")) drawBlockTracer = config["drawBlockTracer"].get<bool>();
+		if (config.contains("crystalAttackTime")) crystalAttackTime = config["crystalAttackTime"].get<int>();
+		if (config.contains("cancelInteraction")) cancelInteraction = config["cancelInteraction"].get<bool>();
+		if (config.contains("crystalPlaceTime")) crystalPlaceTime = config["crystalPlaceTime"].get<int>();
 
         // Load ESP blocks
         espBlockList.clear();

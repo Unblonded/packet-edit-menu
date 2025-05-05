@@ -22,8 +22,8 @@ void setDarkThemeImGui() {
 	style.FramePadding = ImVec2(8, 6);
 	style.ItemSpacing = ImVec2(8, 6);
 	// Backgrounds
-	colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.08f, 0.10f, 0.95f);
-	colors[ImGuiCol_ChildBg] = ImVec4(0.09f, 0.09f, 0.11f, 1.00f);
+	colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.08f, 0.10f, 0.7f);
+	colors[ImGuiCol_ChildBg] = ImVec4(0.09f, 0.09f, 0.11f, 0.7f);
 	colors[ImGuiCol_PopupBg] = ImVec4(0.11f, 0.11f, 0.14f, 0.92f);
 
 	// Interactive elements
@@ -42,9 +42,9 @@ void setDarkThemeImGui() {
 	colors[ImGuiCol_HeaderActive] = ImVec4(0.28f, 0.56f, 0.78f, 1.00f);
 
 	// Custom title bar
-	colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.12f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.15f, 0.18f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.10f, 0.75f);
+	colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.12f, 0.7f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.15f, 0.18f, 0.9f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.10f, 0.65f);
 
 	// Custom scrollbars
 	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.00f);
