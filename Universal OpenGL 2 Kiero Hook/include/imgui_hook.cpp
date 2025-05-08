@@ -7,49 +7,121 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_opengl2.h"
+#include "../cfg.h"
 
-void setDarkThemeImGui() {
+void SetCyberpunkNeonTheme()
+{
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
 
-	// Base styling
-	style.WindowRounding = 12.0f;
-	style.FrameRounding = 6.0f;
-	style.PopupRounding = 6.0f;
-	style.GrabRounding = 12.0f;
-	style.ScrollbarRounding = 9.0f;
-	style.ChildRounding = 12.0f;
-	style.FramePadding = ImVec2(8, 6);
-	style.ItemSpacing = ImVec2(8, 6);
-	// Backgrounds
-	colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.08f, 0.10f, 0.7f);
-	colors[ImGuiCol_ChildBg] = ImVec4(0.09f, 0.09f, 0.11f, 0.7f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.11f, 0.11f, 0.14f, 0.92f);
+	// Base styling with sharp corners and tight spacing
+	style.WindowPadding = ImVec2(15, 15);
+	style.FramePadding = ImVec2(10, 6);
+	style.ItemSpacing = ImVec2(10, 8);
+	style.ItemInnerSpacing = ImVec2(6, 6);
+	style.TouchExtraPadding = ImVec2(0, 0);
+	style.IndentSpacing = 20.0f;
+	style.ScrollbarSize = 12.0f;
+	style.GrabMinSize = 10.0f;
 
-	// Interactive elements
-	colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.20f, 0.25f, 1.00f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.25f, 0.25f, 0.30f, 1.00f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.30f, 0.35f, 1.00f);
+	// Sharp corners for that cyberpunk edge
+	style.WindowRounding = 0.0f;
+	style.ChildRounding = 0.0f;
+	style.FrameRounding = 0.0f;
+	style.PopupRounding = 0.0f;
+	style.ScrollbarRounding = 0.0f;
+	style.GrabRounding = 0.0f;
+	style.TabRounding = 0.0f;
 
-	// Buttons
-	colors[ImGuiCol_Button] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.56f, 0.78f, 0.80f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.50f, 0.72f, 1.00f);
+	// Cyberpunk color palette - NEON INTENSITY
+	const ImVec4 bg_dark = ImVec4(0.03f, 0.03f, 0.06f, 0.98f);  // Deep purple-black
+	const ImVec4 bg_medium = ImVec4(0.08f, 0.05f, 0.12f, 0.95f);  // Dark purple
+	const ImVec4 bg_light = ImVec4(0.12f, 0.08f, 0.18f, 0.95f);  // Medium purple
 
-	// Accents
-	colors[ImGuiCol_Header] = ImVec4(0.28f, 0.56f, 0.78f, 0.45f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(0.28f, 0.56f, 0.78f, 0.80f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(0.28f, 0.56f, 0.78f, 1.00f);
+	// Neon accent colors
+	const ImVec4 neon_pink = ImVec4(1.00f, 0.08f, 0.58f, 1.00f);  // Hot pink
+	const ImVec4 neon_blue = ImVec4(0.08f, 0.85f, 1.00f, 1.00f);  // Electric blue
+	const ImVec4 neon_purple = ImVec4(0.70f, 0.30f, 1.00f, 1.00f);  // Purple haze
+	const ImVec4 neon_green = ImVec4(0.30f, 1.00f, 0.40f, 1.00f);  // Matrix green
 
-	// Custom title bar
-	colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.12f, 0.7f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.15f, 0.18f, 0.9f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.10f, 0.65f);
+	const ImVec4 text_primary = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);  // Bright white
+	const ImVec4 text_secondary = ImVec4(0.70f, 0.71f, 0.75f, 1.00f);  // Grayish
+	const ImVec4 border_color = ImVec4(0.40f, 0.20f, 0.60f, 0.60f);  // Purple border
 
-	// Custom scrollbars
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.00f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.40f, 0.40f, 0.50f, 0.30f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.50f, 0.50f, 0.60f, 0.40f);
+	// Main colors
+	colors[ImGuiCol_Text] = text_primary;
+	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+	colors[ImGuiCol_WindowBg] = bg_dark;
+	colors[ImGuiCol_ChildBg] = bg_medium;
+	colors[ImGuiCol_PopupBg] = bg_medium;
+	colors[ImGuiCol_Border] = neon_purple;
+	colors[ImGuiCol_BorderShadow] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.30f);
+
+	// Frame background
+	colors[ImGuiCol_FrameBg] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.80f);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(neon_purple.x * 0.4f, neon_purple.y * 0.4f, neon_purple.z * 0.4f, 0.40f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(neon_purple.x * 0.5f, neon_purple.y * 0.5f, neon_purple.z * 0.5f, 0.60f);
+
+	// Title bars
+	colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.05f, 0.12f, 1.00f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(neon_purple.x * 0.25f, neon_purple.y * 0.25f, neon_purple.z * 0.25f, 1.00f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.05f, 0.12f, 0.75f);
+
+	// Buttons - ALTERNATING NEON COLORS
+	colors[ImGuiCol_Button] = neon_pink;
+	colors[ImGuiCol_ButtonHovered] = ImVec4(neon_pink.x + 0.2f, neon_pink.y + 0.2f, neon_pink.z + 0.2f, 1.00f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(neon_pink.x - 0.1f, neon_pink.y - 0.1f, neon_pink.z - 0.1f, 1.00f);
+
+	// Headers
+	colors[ImGuiCol_Header] = neon_blue;
+	colors[ImGuiCol_HeaderHovered] = ImVec4(neon_blue.x + 0.2f, neon_blue.y + 0.2f, neon_blue.z + 0.2f, 1.00f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(neon_blue.x - 0.1f, neon_blue.y - 0.1f, neon_blue.z - 0.1f, 1.00f);
+
+	// Scrollbars
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.60f);
+	colors[ImGuiCol_ScrollbarGrab] = neon_purple;
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(neon_purple.x + 0.2f, neon_purple.y + 0.2f, neon_purple.z + 0.2f, 1.00f);
+	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(neon_purple.x - 0.1f, neon_purple.y - 0.1f, neon_purple.z - 0.1f, 1.00f);
+
+	// Checkbox, RadioButton, etc.
+	colors[ImGuiCol_CheckMark] = neon_green;
+	colors[ImGuiCol_SliderGrab] = neon_pink;
+	colors[ImGuiCol_SliderGrabActive] = neon_blue;
+
+	// Text input
+	colors[ImGuiCol_TextSelectedBg] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.35f);
+
+	// Tabs
+	colors[ImGuiCol_Tab] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.80f);
+	colors[ImGuiCol_TabHovered] = neon_purple;
+	colors[ImGuiCol_TabActive] = ImVec4(neon_purple.x * 0.8f, neon_purple.y * 0.8f, neon_purple.z * 0.8f, 0.80f);
+	colors[ImGuiCol_TabUnfocused] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.80f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.80f);
+
+	// Separators - GLOWING EDGES
+	colors[ImGuiCol_Separator] = neon_blue;
+	colors[ImGuiCol_SeparatorHovered] = neon_pink;
+	colors[ImGuiCol_SeparatorActive] = neon_green;
+
+	// Resize grip
+	colors[ImGuiCol_ResizeGrip] = neon_purple;
+	colors[ImGuiCol_ResizeGripHovered] = neon_pink;
+	colors[ImGuiCol_ResizeGripActive] = neon_blue;
+
+	// Plot lines
+	colors[ImGuiCol_PlotLines] = neon_green;
+	colors[ImGuiCol_PlotLinesHovered] = neon_pink;
+	colors[ImGuiCol_PlotHistogram] = neon_blue;
+	colors[ImGuiCol_PlotHistogramHovered] = neon_purple;
+
+	// Navigation
+	colors[ImGuiCol_NavHighlight] = neon_pink;
+	colors[ImGuiCol_NavWindowingHighlight] = neon_blue;
+	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+
+	// For extra glow effect (requires custom rendering)
+	style.Alpha = 1.0f;
 }
 
 
@@ -148,7 +220,7 @@ namespace ImGuiHook
 		tStatus &= ImGui_ImplOpenGL2_Init();
 
 		*init = true;
-		setDarkThemeImGui();
+		SetCyberpunkNeonTheme();
 		ImGuiIO& io = ImGui::GetIO();
 		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 16.0f);
 		return ExitStatus(status, tStatus);
@@ -161,29 +233,102 @@ namespace ImGuiHook
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		render();
+		static float pulse_speed = 3.5f;
+		static float pulse = 0.5f + 0.5f * sinf(ImGui::GetTime() * pulse_speed);
+		static float pulse_alt = 0.5f + 0.5f * cosf(ImGui::GetTime() * pulse_speed * 0.8f);
+		static ImVec4 neon_pink = ImVec4(1.0f, 0.1f, 0.6f, 1.0f);
+		static ImVec4 neon_blue = ImVec4(0.1f, 0.9f, 1.0f, 1.0f);
+		static ImVec4 neon_purple = ImVec4(0.7f, 0.3f, 1.0f, 1.0f);
+
+		// ===== MAIN UI RENDERING =====
+		render();  // This calls your RenderMain() function
+
+		// ===== POST-RENDER EFFECTS =====
+		if (cfg::showMenu) {
+			ImDrawList* bg_draw_list = ImGui::GetBackgroundDrawList();
+			ImVec2 display_size = ImGui::GetIO().DisplaySize;
+
+			// Fullscreen glow overlay (drawn before ImGui content)
+			bg_draw_list->AddRectFilledMultiColor(
+				ImVec2(0, 0),
+				display_size,
+				IM_COL32(0, 0, 0, 0),
+				IM_COL32(0, 0, 0, 0),
+				IM_COL32(100, 0, 255, 10 + (int)(5 * pulse)),  // Purple glow
+				IM_COL32(0, 200, 255, 10 + (int)(5 * pulse))  // Blue glow
+			);
+
+			// Scanlines (drawn over everything)
+			for (int y = 0; y < display_size.y; y += 3) {
+				bg_draw_list->AddLine(
+					ImVec2(0, y),
+					ImVec2(display_size.x, y),
+					IM_COL32(0, 255, 255, 5 + (int)(3 * pulse))
+				);
+			}
+		}
 
 		ImGui::EndFrame();
 		ImGui::Render();
+		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	// Generic ImGui renderer for OpenGL2 backend
 	void RenderOpenGL2(
-		IN  HGLRC 	  WglContext,
-		IN  HDC		  hDc,
+		IN  HGLRC     WglContext,
+		IN  HDC       hDc,
 		IN  _VOID_2() render,
 		IN  _VOID_1() render_inner,
-		OUT bool*	  status)
+		OUT bool* status)
 	{
 		auto tStatus = true;
-
 		auto o_WglContext = wglGetCurrentContext();
 		tStatus &= wglMakeCurrent(hDc, WglContext);
 
+		// ===== CYBERPUNK ANIMATION SETUP =====
+		static float pulse_speed = 3.5f;
+		static float pulse = 0.5f + 0.5f * sinf(ImGui::GetTime() * pulse_speed);
+		static float pulse_alt = 0.5f + 0.5f * cosf(ImGui::GetTime() * pulse_speed * 0.8f);
+		static ImVec4 neon_pink = ImVec4(1.0f, 0.1f, 0.6f, 1.0f);
+		static ImVec4 neon_blue = ImVec4(0.1f, 0.9f, 1.0f, 1.0f);
+		static ImVec4 neon_purple = ImVec4(0.7f, 0.3f, 1.0f, 1.0f);
+
+		// Start new ImGui frame
 		ImGui_ImplOpenGL2_NewFrame();
-		render(render_inner);
+
+		// ===== MAIN UI RENDERING =====
+		render(render_inner);  // This calls your RenderMain() function
+
+		// ===== POST-RENDER EFFECTS =====
+		if (cfg::showMenu) {
+			ImDrawList* bg_draw_list = ImGui::GetBackgroundDrawList();
+			ImVec2 display_size = ImGui::GetIO().DisplaySize;
+
+			// Fullscreen glow overlay (drawn before ImGui content)
+			bg_draw_list->AddRectFilledMultiColor(
+				ImVec2(0, 0),
+				display_size,
+				IM_COL32(0, 0, 0, 0),
+				IM_COL32(0, 0, 0, 0),
+				IM_COL32(100, 0, 255, 10 + (int)(5 * pulse)),  // Purple glow
+				IM_COL32(0, 200, 255, 10 + (int)(5 * pulse))  // Blue glow
+			);
+
+			// Scanlines (drawn over everything)
+			for (int y = 0; y < display_size.y; y += 3) {
+				bg_draw_list->AddLine(
+					ImVec2(0, y),
+					ImVec2(display_size.x, y),
+					IM_COL32(0, 255, 255, 5 + (int)(3 * pulse))
+				);
+			}
+		}
+
+		// ===== FINAL RENDER =====
+		ImGui::Render();
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
+		// Restore original OpenGL context
 		tStatus &= wglMakeCurrent(hDc, o_WglContext);
 
 		return ExitStatus(status, tStatus);

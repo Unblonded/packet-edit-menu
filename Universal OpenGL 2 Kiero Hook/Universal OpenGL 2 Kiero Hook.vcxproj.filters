@@ -137,5 +137,8 @@
     <ClInclude Include="include\kiero\minhook\include\MinHook.h">
       <Filter>Includes\kiero\minhook\include</Filter>
     </ClInclude>
+    <ClInclude Include="cfg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
