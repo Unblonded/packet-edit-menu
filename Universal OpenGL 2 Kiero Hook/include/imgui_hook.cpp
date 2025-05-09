@@ -25,103 +25,109 @@ void SetCyberpunkNeonTheme()
 	style.GrabMinSize = 10.0f;
 
 	// Sharp corners for that cyberpunk edge
-	style.WindowRounding = 0.0f;
-	style.ChildRounding = 0.0f;
-	style.FrameRounding = 0.0f;
-	style.PopupRounding = 0.0f;
-	style.ScrollbarRounding = 0.0f;
-	style.GrabRounding = 0.0f;
-	style.TabRounding = 0.0f;
+	style.WindowRounding = 4.0f;
+	style.ChildRounding = 4.0f;
+	style.FrameRounding = 4.0f;
+	style.PopupRounding = 4.0f;
+	style.ScrollbarRounding = 4.0f;
+	style.GrabRounding = 4.0f;
+	style.TabRounding = 4.0f;
 
-	// Cyberpunk color palette - NEON INTENSITY
-	const ImVec4 bg_dark = ImVec4(0.03f, 0.03f, 0.06f, 0.98f);  // Deep purple-black
-	const ImVec4 bg_medium = ImVec4(0.08f, 0.05f, 0.12f, 0.95f);  // Dark purple
-	const ImVec4 bg_light = ImVec4(0.12f, 0.08f, 0.18f, 0.95f);  // Medium purple
+	// Cyberpunk color palette - NEON INTENSITY with MORE TRANSPARENCY
+	const ImVec4 bg_dark = ImVec4(0.03f, 0.03f, 0.06f, 0.85f);     // Deep purple-black with transparency
+	const ImVec4 bg_medium = ImVec4(0.08f, 0.05f, 0.12f, 0.82f);   // Dark purple with transparency
+	const ImVec4 bg_light = ImVec4(0.12f, 0.08f, 0.18f, 0.80f);    // Medium purple with transparency
 
-	// Neon accent colors
-	const ImVec4 neon_pink = ImVec4(1.00f, 0.08f, 0.58f, 1.00f);  // Hot pink
-	const ImVec4 neon_blue = ImVec4(0.08f, 0.85f, 1.00f, 1.00f);  // Electric blue
-	const ImVec4 neon_purple = ImVec4(0.70f, 0.30f, 1.00f, 1.00f);  // Purple haze
-	const ImVec4 neon_green = ImVec4(0.30f, 1.00f, 0.40f, 1.00f);  // Matrix green
+	// Neon accent colors with transparency
+	const ImVec4 neon_pink = ImVec4(1.00f, 0.08f, 0.58f, 0.85f);    // Hot pink
+	const ImVec4 neon_blue = ImVec4(0.08f, 0.85f, 1.00f, 0.85f);    // Electric blue
+	const ImVec4 neon_purple = ImVec4(0.70f, 0.30f, 1.00f, 0.85f);  // Purple haze
+	const ImVec4 neon_green = ImVec4(0.30f, 1.00f, 0.40f, 0.85f);   // Matrix green
 
-	const ImVec4 text_primary = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);  // Bright white
-	const ImVec4 text_secondary = ImVec4(0.70f, 0.71f, 0.75f, 1.00f);  // Grayish
-	const ImVec4 border_color = ImVec4(0.40f, 0.20f, 0.60f, 0.60f);  // Purple border
+	// Solid versions of neon colors for text and important elements
+	const ImVec4 solid_pink = ImVec4(1.00f, 0.08f, 0.58f, 1.00f);
+	const ImVec4 solid_blue = ImVec4(0.08f, 0.85f, 1.00f, 1.00f);
+	const ImVec4 solid_purple = ImVec4(0.70f, 0.30f, 1.00f, 1.00f);
+	const ImVec4 solid_green = ImVec4(0.30f, 1.00f, 0.40f, 1.00f);
+
+	const ImVec4 text_primary = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);   // Bright white
+	const ImVec4 text_secondary = ImVec4(0.70f, 0.71f, 0.75f, 0.85f); // Grayish with transparency
+	const ImVec4 border_color = ImVec4(0.40f, 0.20f, 0.60f, 0.40f);   // Purple border with more transparency
 
 	// Main colors
 	colors[ImGuiCol_Text] = text_primary;
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 0.65f);
 	colors[ImGuiCol_WindowBg] = bg_dark;
-	colors[ImGuiCol_ChildBg] = bg_medium;
-	colors[ImGuiCol_PopupBg] = bg_medium;
-	colors[ImGuiCol_Border] = neon_purple;
-	colors[ImGuiCol_BorderShadow] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.30f);
+	colors[ImGuiCol_ChildBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.70f); // More transparent
+	colors[ImGuiCol_PopupBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.85f);
+	colors[ImGuiCol_Border] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.35f); // Subtle border
+	colors[ImGuiCol_BorderShadow] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.15f);
 
-	// Frame background
-	colors[ImGuiCol_FrameBg] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.80f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(neon_purple.x * 0.4f, neon_purple.y * 0.4f, neon_purple.z * 0.4f, 0.40f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(neon_purple.x * 0.5f, neon_purple.y * 0.5f, neon_purple.z * 0.5f, 0.60f);
+	// Frame background - more transparent
+	colors[ImGuiCol_FrameBg] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.60f);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(neon_purple.x * 0.4f, neon_purple.y * 0.4f, neon_purple.z * 0.4f, 0.35f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(neon_purple.x * 0.5f, neon_purple.y * 0.5f, neon_purple.z * 0.5f, 0.50f);
 
-	// Title bars
-	colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.05f, 0.12f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(neon_purple.x * 0.25f, neon_purple.y * 0.25f, neon_purple.z * 0.25f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.05f, 0.12f, 0.75f);
+	// Title bars - semi-transparent
+	colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.05f, 0.12f, 0.80f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(neon_purple.x * 0.25f, neon_purple.y * 0.25f, neon_purple.z * 0.25f, 0.85f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.05f, 0.12f, 0.50f);
 
-	// Buttons - ALTERNATING NEON COLORS
-	colors[ImGuiCol_Button] = neon_pink;
-	colors[ImGuiCol_ButtonHovered] = ImVec4(neon_pink.x + 0.2f, neon_pink.y + 0.2f, neon_pink.z + 0.2f, 1.00f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(neon_pink.x - 0.1f, neon_pink.y - 0.1f, neon_pink.z - 0.1f, 1.00f);
+	// Buttons - ALTERNATING NEON COLORS with transparency
+	colors[ImGuiCol_Button] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(neon_pink.x + 0.2f, neon_pink.y + 0.2f, neon_pink.z + 0.2f, 0.70f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(neon_pink.x - 0.1f, neon_pink.y - 0.1f, neon_pink.z - 0.1f, 0.80f);
 
-	// Headers
-	colors[ImGuiCol_Header] = neon_blue;
-	colors[ImGuiCol_HeaderHovered] = ImVec4(neon_blue.x + 0.2f, neon_blue.y + 0.2f, neon_blue.z + 0.2f, 1.00f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(neon_blue.x - 0.1f, neon_blue.y - 0.1f, neon_blue.z - 0.1f, 1.00f);
+	// Headers - more transparent
+	colors[ImGuiCol_Header] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.55f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(neon_blue.x + 0.2f, neon_blue.y + 0.2f, neon_blue.z + 0.2f, 0.65f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(neon_blue.x - 0.1f, neon_blue.y - 0.1f, neon_blue.z - 0.1f, 0.75f);
 
-	// Scrollbars
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.60f);
-	colors[ImGuiCol_ScrollbarGrab] = neon_purple;
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(neon_purple.x + 0.2f, neon_purple.y + 0.2f, neon_purple.z + 0.2f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(neon_purple.x - 0.1f, neon_purple.y - 0.1f, neon_purple.z - 0.1f, 1.00f);
+	// Scrollbars - more transparent
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.40f);
+	colors[ImGuiCol_ScrollbarGrab] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.60f);
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(neon_purple.x + 0.2f, neon_purple.y + 0.2f, neon_purple.z + 0.2f, 0.70f);
+	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(neon_purple.x - 0.1f, neon_purple.y - 0.1f, neon_purple.z - 0.1f, 0.80f);
 
-	// Checkbox, RadioButton, etc.
-	colors[ImGuiCol_CheckMark] = neon_green;
-	colors[ImGuiCol_SliderGrab] = neon_pink;
-	colors[ImGuiCol_SliderGrabActive] = neon_blue;
+	// Checkbox, RadioButton, etc. - keeping solid for visibility
+	colors[ImGuiCol_CheckMark] = solid_green;
+	colors[ImGuiCol_SliderGrab] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.75f);
+	colors[ImGuiCol_SliderGrabActive] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.85f);
 
-	// Text input
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.35f);
+	// Text input - more subtle selection
+	colors[ImGuiCol_TextSelectedBg] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.25f);
 
-	// Tabs
-	colors[ImGuiCol_Tab] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.80f);
-	colors[ImGuiCol_TabHovered] = neon_purple;
-	colors[ImGuiCol_TabActive] = ImVec4(neon_purple.x * 0.8f, neon_purple.y * 0.8f, neon_purple.z * 0.8f, 0.80f);
-	colors[ImGuiCol_TabUnfocused] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.80f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.80f);
+	// Tabs - with transparency gradient
+	colors[ImGuiCol_Tab] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.65f);
+	colors[ImGuiCol_TabHovered] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.70f);
+	colors[ImGuiCol_TabActive] = ImVec4(neon_purple.x * 0.8f, neon_purple.y * 0.8f, neon_purple.z * 0.8f, 0.75f);
+	colors[ImGuiCol_TabUnfocused] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.55f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.65f);
 
-	// Separators - GLOWING EDGES
-	colors[ImGuiCol_Separator] = neon_blue;
-	colors[ImGuiCol_SeparatorHovered] = neon_pink;
-	colors[ImGuiCol_SeparatorActive] = neon_green;
+	// Separators - GLOWING EDGES with transparency
+	colors[ImGuiCol_Separator] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.50f);
+	colors[ImGuiCol_SeparatorHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
+	colors[ImGuiCol_SeparatorActive] = ImVec4(neon_green.x, neon_green.y, neon_green.z, 0.70f);
 
-	// Resize grip
-	colors[ImGuiCol_ResizeGrip] = neon_purple;
-	colors[ImGuiCol_ResizeGripHovered] = neon_pink;
-	colors[ImGuiCol_ResizeGripActive] = neon_blue;
+	// Resize grip - with transparency
+	colors[ImGuiCol_ResizeGrip] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.40f);
+	colors[ImGuiCol_ResizeGripHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
+	colors[ImGuiCol_ResizeGripActive] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.80f);
 
-	// Plot lines
-	colors[ImGuiCol_PlotLines] = neon_green;
-	colors[ImGuiCol_PlotLinesHovered] = neon_pink;
-	colors[ImGuiCol_PlotHistogram] = neon_blue;
-	colors[ImGuiCol_PlotHistogramHovered] = neon_purple;
+	// Plot lines - keeping more visible
+	colors[ImGuiCol_PlotLines] = ImVec4(neon_green.x, neon_green.y, neon_green.z, 0.80f);
+	colors[ImGuiCol_PlotLinesHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.90f);
+	colors[ImGuiCol_PlotHistogram] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.80f);
+	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.90f);
 
-	// Navigation
-	colors[ImGuiCol_NavHighlight] = neon_pink;
-	colors[ImGuiCol_NavWindowingHighlight] = neon_blue;
-	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+	// Navigation - slightly transparent
+	colors[ImGuiCol_NavHighlight] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.80f);
+	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.70f);
+	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.60f);
 
-	// For extra glow effect (requires custom rendering)
-	style.Alpha = 1.0f;
+	// For extra glow effect
+	style.Alpha = 0.95f; // Global transparency
 }
 
 

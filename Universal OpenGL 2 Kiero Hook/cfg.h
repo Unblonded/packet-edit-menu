@@ -10,10 +10,11 @@
 struct EspBlock {
     std::string name;
     ImVec4 color;
+    bool enabled;
 
     // Constructor to initialize a block with a name and a color
-    EspBlock(const std::string& blockName, const ImVec4& blockColor)
-        : name(blockName), color(blockColor) {
+    EspBlock(const std::string& blockName, const ImVec4& blockColor, const bool blockEnabled)
+        : name(blockName), color(blockColor), enabled(blockEnabled) {
     }
 };
 
@@ -31,7 +32,7 @@ public:
     inline static bool drawBlocks;
     inline static bool drawBlockTracer;
     inline static char blockName[256];
-    inline static ImVec4 blockColor;
+    inline static ImVec4 blockColor = ImVec4(1.f, 1.f, 1.f, 1.f);
     inline static std::vector<EspBlock> espBlockList;
     inline static int espRadius;
     inline static int espBatchSize;
@@ -51,4 +52,7 @@ public:
     inline static bool oreSim;
     inline static int oreSimDistance;
     inline static ImVec4 oreSimColor;
+    inline static bool autoTotem;
+	inline static int autoTotemDelay;
+    inline static int autoTotemHumanity;
 };

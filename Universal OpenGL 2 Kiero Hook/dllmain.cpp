@@ -62,6 +62,7 @@ void RenderMain()
         ImGui::Checkbox("Auto Crystal", &cfg::autoCrystal);
         ImGui::Checkbox("Interaction Canceler", &cfg::cancelInteraction);
         ImGui::Checkbox("Auto Anchor", &cfg::autoAnchor);
+        ImGui::Checkbox("Auto Totem", &cfg::autoTotem);
 
         // Special animation for Seed-Ray checkbox
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(
@@ -76,6 +77,14 @@ void RenderMain()
         ImGui::End();
         ImGui::PopStyleVar(); // WindowBorderSize
         ImGui::PopStyleColor();
+
+        if (cfg::autoTotem) {
+			ImGui::Begin("Auto Totem");
+			ImGui::Text("Auto Totem is enabled.");
+			ImGui::SliderInt("Delay (ms)", &cfg::autoTotemDelay, 5, 500);
+			ImGui::SliderInt("Humanity", &cfg::autoTotemHumanity, 0, 200);
+			ImGui::End();
+        }
 
         if (cfg::oreSim) {
             // Seed-Ray window with scanline effect
@@ -128,14 +137,14 @@ void RenderMain()
 
             ImGui::Text("ESP Settings:");
             ImGui::SliderInt("Esp Radius", &cfg::espRadius, 16, 128);
-            ImGui::SliderInt("Batch Size x1K", &cfg::espBatchSize, 50, 200);
+            ImGui::SliderInt("Batch Size x1K", &cfg::espBatchSize, 50, 400);
             ImGui::SliderInt("Search Time (sec)", &cfg::espSearchTime, 0, 20);
             ImGui::Checkbox("Draw Blocks", &cfg::drawBlocks);
             if (cfg::drawBlocks) ImGui::Checkbox("Draw Tracers", &cfg::drawBlockTracer);
 
             // Add new block input
             ImGui::InputText("Block Name", cfg::blockName, sizeof(cfg::blockName));
-            ImGui::ColorEdit4("Block Color", (float*)&cfg::blockColor); // Color picker for the block
+            ImGui::ColorEdit4("Block Color", (float*)&cfg::blockColor);
 
             if (ImGui::Button("Add Block to ESP")) {
                 // Check if the block already exists in the list
@@ -149,7 +158,7 @@ void RenderMain()
 
                 // If the block does not exist, add it to the list
                 if (!exists) {
-                    cfg::espBlockList.push_back(EspBlock(cfg::blockName, cfg::blockColor)); // Add the new block with color
+                    cfg::espBlockList.push_back(EspBlock(cfg::blockName, cfg::blockColor, true)); // Add the new block with color
                 }
             }
 
@@ -159,7 +168,10 @@ void RenderMain()
             ImGui::BeginChild("BlockListChild", ImVec2(0, 150), true);
 
             for (int i = 0; i < cfg::espBlockList.size(); ++i) {
+                std::string label = "##" + cfg::espBlockList[i].name;
                 ImGui::PushID(i);
+                ImGui::Checkbox(label.c_str(), &cfg::espBlockList[i].enabled);
+                ImGui::SameLine();
                 ImGui::ColorEdit4("##color", (float*)&cfg::espBlockList[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
                 ImGui::SameLine();
                 ImGui::TextUnformatted(cfg::espBlockList[i].name.c_str());
@@ -294,13 +306,17 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["oreSimSeed"] = cfg::oreSimSeed;
 				config["oreSimDistance"] = cfg::oreSimDistance;
 				config["oreSimColor"] = { cfg::oreSimColor.x, cfg::oreSimColor.y, cfg::oreSimColor.z, cfg::oreSimColor.w };
+				config["autoTotem"] = cfg::autoTotem;
+				config["autoTotemDelay"] = cfg::autoTotemDelay;
+				config["autoTotemHumanity"] = cfg::autoTotemHumanity;
 
                 json espBlocksJson = json::array();
                 for (const auto& block : cfg::espBlockList) {
-                    espBlocksJson.push_back({
-                        {"name", block.name},
-                        {"color", {block.color.x, block.color.y, block.color.z, block.color.w}}
-                        });
+                        espBlocksJson.push_back({
+                            {"name", block.name},
+                            {"color", {block.color.x, block.color.y, block.color.z, block.color.w}},
+							{"enabled", block.enabled}
+                            });
                 }
                 config["espBlockList"] = espBlocksJson;
 
@@ -418,12 +434,16 @@ void saveSettings() {
 	config["oreSimSeed"] = cfg::oreSimSeed;
 	config["oreSimDistance"] = cfg::oreSimDistance;
 	config["oreSimColor"] = { cfg::oreSimColor.x, cfg::oreSimColor.y, cfg::oreSimColor.z, cfg::oreSimColor.w };
+	config["autoTotem"] = cfg::autoTotem;
+	config["autoTotemDelay"] = cfg::autoTotemDelay;
+	config["autoTotemHumanity"] = cfg::autoTotemHumanity;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
         blocksJson.push_back({
             {"name", block.name},
-            {"color", {block.color.x, block.color.y, block.color.z, block.color.w}}
+            {"color", {block.color.x, block.color.y, block.color.z, block.color.w}},
+			{"enabled", block.enabled}
             });
     }
     config["espBlockList"] = blocksJson;
@@ -462,6 +482,9 @@ void loadSettings() {
 		if (config.contains("oreSimDistance")) cfg::oreSimDistance = config["oreSimDistance"].get<int>();
 		if (config.contains("oreSimColor") && config["oreSimColor"].is_array() && config["oreSimColor"].size() == 4)
             cfg::oreSimColor = ImVec4(config["oreSimColor"][0], config["oreSimColor"][1], config["oreSimColor"][2], config["oreSimColor"][3]);
+		if (config.contains("autoTotem")) cfg::autoTotem = config["autoTotem"].get<bool>();
+		if (config.contains("autoTotemDelay")) cfg::autoTotemDelay = config["autoTotemDelay"].get<int>();
+		if (config.contains("autoTotemHumanity")) cfg::autoTotemHumanity = config["autoTotemHumanity"].get<int>();
 
         // Load ESP blocks
         cfg::espBlockList.clear();
@@ -470,7 +493,8 @@ void loadSettings() {
                 if (item.contains("name") && item.contains("color") && item["color"].size() == 4) {
                     cfg::espBlockList.push_back({
                         item["name"],
-                        ImVec4(item["color"][0], item["color"][1], item["color"][2], item["color"][3])
+                        ImVec4(item["color"][0], item["color"][1], item["color"][2], item["color"][3]),
+						item.value("enabled", true)
                         });
                 }
             }
