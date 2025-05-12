@@ -166,6 +166,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cfg.h" />
+    <ClInclude Include="font_data.h" />
+    <ClInclude Include="IconsFontAwesome5.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\imgui_impl_opengl2.h" />

@@ -1,13 +1,46 @@
 #include <Windows.h>
 #include <functional> 
 #include <GL/gl.h>
-#include <iostream>
-#include <algorithm>
 #include "kiero/kiero.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_opengl2.h"
 #include "../cfg.h"
+#include "../IconsFontAwesome5.h"
+#include "../font_data.h"
+
+bool InitFonts(ImGuiIO& io)
+{
+	// Clear any existing fonts
+	io.Fonts->Clear();
+
+	// Load regular font (Segoe UI)
+	ImFont* mainFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 16.0f);
+	if (!mainFont) {
+		// Fallback to default font
+		mainFont = io.Fonts->AddFontDefault();
+	}
+
+	// Font Awesome config
+	static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+	ImFontConfig icons_config;
+	icons_config.MergeMode = true;
+	icons_config.PixelSnapH = true;
+
+	// Merge Font Awesome into the regular font
+	io.Fonts->AddFontFromMemoryTTF(
+		(void*)fa_solid_900_ttf,
+		fa_solid_900_ttf_len,
+		16.0f,
+		&icons_config,
+		icons_ranges
+	);
+
+	// Build font atlas
+	io.Fonts->Build();
+
+	return true;
+}
 
 void SetCyberpunkNeonTheme()
 {
@@ -228,56 +261,25 @@ namespace ImGuiHook
 		*init = true;
 		SetCyberpunkNeonTheme();
 		ImGuiIO& io = ImGui::GetIO();
-		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 16.0f);
+		InitFonts(io);
 		return ExitStatus(status, tStatus);
 	}
 
 	// Generic ImGui renderer for Win32 backend
-	void RenderWin32(
-		IN  std::function<void()> render)
-	{
+	void RenderWin32(std::function<void()> render) {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		static float pulse_speed = 3.5f;
-		static float pulse = 0.5f + 0.5f * sinf(ImGui::GetTime() * pulse_speed);
-		static float pulse_alt = 0.5f + 0.5f * cosf(ImGui::GetTime() * pulse_speed * 0.8f);
-		static ImVec4 neon_pink = ImVec4(1.0f, 0.1f, 0.6f, 1.0f);
-		static ImVec4 neon_blue = ImVec4(0.1f, 0.9f, 1.0f, 1.0f);
-		static ImVec4 neon_purple = ImVec4(0.7f, 0.3f, 1.0f, 1.0f);
+		render();
 
-		// ===== MAIN UI RENDERING =====
-		render();  // This calls your RenderMain() function
-
-		// ===== POST-RENDER EFFECTS =====
-		if (cfg::showMenu) {
-			ImDrawList* bg_draw_list = ImGui::GetBackgroundDrawList();
-			ImVec2 display_size = ImGui::GetIO().DisplaySize;
-
-			// Fullscreen glow overlay (drawn before ImGui content)
-			bg_draw_list->AddRectFilledMultiColor(
-				ImVec2(0, 0),
-				display_size,
-				IM_COL32(0, 0, 0, 0),
-				IM_COL32(0, 0, 0, 0),
-				IM_COL32(100, 0, 255, 10 + (int)(5 * pulse)),  // Purple glow
-				IM_COL32(0, 200, 255, 10 + (int)(5 * pulse))  // Blue glow
-			);
-
-			// Scanlines (drawn over everything)
-			for (int y = 0; y < display_size.y; y += 3) {
-				bg_draw_list->AddLine(
-					ImVec2(0, y),
-					ImVec2(display_size.x, y),
-					IM_COL32(0, 255, 255, 5 + (int)(3 * pulse))
-				);
-			}
-		}
+		if (cfg::showMenu && cfg::backgroundFx) RenderCustomShaders();
 
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	}
+
+
 
 	// Generic ImGui renderer for OpenGL2 backend
 	void RenderOpenGL2(
@@ -291,14 +293,6 @@ namespace ImGuiHook
 		auto o_WglContext = wglGetCurrentContext();
 		tStatus &= wglMakeCurrent(hDc, WglContext);
 
-		// ===== CYBERPUNK ANIMATION SETUP =====
-		static float pulse_speed = 3.5f;
-		static float pulse = 0.5f + 0.5f * sinf(ImGui::GetTime() * pulse_speed);
-		static float pulse_alt = 0.5f + 0.5f * cosf(ImGui::GetTime() * pulse_speed * 0.8f);
-		static ImVec4 neon_pink = ImVec4(1.0f, 0.1f, 0.6f, 1.0f);
-		static ImVec4 neon_blue = ImVec4(0.1f, 0.9f, 1.0f, 1.0f);
-		static ImVec4 neon_purple = ImVec4(0.7f, 0.3f, 1.0f, 1.0f);
-
 		// Start new ImGui frame
 		ImGui_ImplOpenGL2_NewFrame();
 
@@ -306,29 +300,6 @@ namespace ImGuiHook
 		render(render_inner);  // This calls your RenderMain() function
 
 		// ===== POST-RENDER EFFECTS =====
-		if (cfg::showMenu) {
-			ImDrawList* bg_draw_list = ImGui::GetBackgroundDrawList();
-			ImVec2 display_size = ImGui::GetIO().DisplaySize;
-
-			// Fullscreen glow overlay (drawn before ImGui content)
-			bg_draw_list->AddRectFilledMultiColor(
-				ImVec2(0, 0),
-				display_size,
-				IM_COL32(0, 0, 0, 0),
-				IM_COL32(0, 0, 0, 0),
-				IM_COL32(100, 0, 255, 10 + (int)(5 * pulse)),  // Purple glow
-				IM_COL32(0, 200, 255, 10 + (int)(5 * pulse))  // Blue glow
-			);
-
-			// Scanlines (drawn over everything)
-			for (int y = 0; y < display_size.y; y += 3) {
-				bg_draw_list->AddLine(
-					ImVec2(0, y),
-					ImVec2(display_size.x, y),
-					IM_COL32(0, 255, 255, 5 + (int)(3 * pulse))
-				);
-			}
-		}
 
 		// ===== FINAL RENDER =====
 		ImGui::Render();

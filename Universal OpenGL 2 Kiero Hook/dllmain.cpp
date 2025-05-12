@@ -10,6 +10,8 @@
 #include <Shlobj.h>
 #include <filesystem>
 #include "cfg.h"
+#include "IconsFontAwesome5.h"
+
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 #pragma comment(lib, "ws2_32.lib")
@@ -55,41 +57,126 @@ void RenderMain()
         ));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, neon_pink);
 
-        ImGui::Checkbox("Show Player List", &cfg::displayPlayers);
-        ImGui::Checkbox("Advanced ESP", &cfg::advEsp);
-        ImGui::Checkbox("Player Dig Safety", &cfg::checkPlayerAirSafety);
-        ImGui::Checkbox("Straight Tunnel", &cfg::forwardTunnel);
-        ImGui::Checkbox("Auto Crystal", &cfg::autoCrystal);
-        ImGui::Checkbox("Interaction Canceler", &cfg::cancelInteraction);
-        ImGui::Checkbox("Auto Anchor", &cfg::autoAnchor);
-        ImGui::Checkbox("Auto Totem", &cfg::autoTotem);
+        if (ImGui::BeginTabBar("MainTabBar", ImGuiTabBarFlags_None))
+        {
+            // Combat & PvP Tab
+            if (ImGui::BeginTabItem("Combat"))
+            {
+                ImGui::Checkbox("Auto Crystal", &cfg::autoCrystal);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##crystal")) cfg::autoCrystalcfg = !cfg::autoCrystalcfg;
 
-        // Special animation for Seed-Ray checkbox
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(
-            neon_purple.x * pulse,
-            neon_purple.y * pulse,
-            neon_purple.z * pulse,
-            0.8f
-        ));
-        ImGui::Checkbox("Seed-Ray", &cfg::oreSim);
-        ImGui::PopStyleColor(4); // Pop all checkbox styles
+                ImGui::Checkbox("Auto Totem", &cfg::autoTotem);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##totem")) cfg::autoTotemcfg = !cfg::autoTotemcfg;
+
+                ImGui::Checkbox("Auto Anchor", &cfg::autoAnchor);
+
+                ImGui::EndTabItem();
+            }
+
+
+            // ESP & Visual Tab
+            if (ImGui::BeginTabItem("Visuals"))
+            {
+                ImGui::Checkbox("Show Player List", &cfg::displayPlayers);
+                ImGui::Checkbox("Advanced ESP", &cfg::advEsp);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##advesp")) cfg::advEspcfg = !cfg::advEspcfg;
+				ImGui::Checkbox("Show Background Effects", &cfg::backgroundFx);
+                ImGui::EndTabItem();
+            }
+
+            // Utility Tab
+            if (ImGui::BeginTabItem("Utility"))
+            {
+                ImGui::Checkbox("Player Dig Safety", &cfg::checkPlayerAirSafety);
+                ImGui::Checkbox("Interaction Canceler", &cfg::cancelInteraction);
+                ImGui::Checkbox("Auto Disconnect", &cfg::autoDc);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##autodc")) cfg::autoDccfg = !cfg::autoDccfg;
+                ImGui::Checkbox("Auto Sell", &cfg::autoSell);
+				ImGui::SameLine();
+				if (ImGui::Button(ICON_FA_COGS "##autosell")) cfg::autoSellcfg = !cfg::autoSellcfg;
+				ImGui::Checkbox("Chat Filter", &cfg::chatFilter);
+				ImGui::SameLine();
+				if (ImGui::Button(ICON_FA_COGS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
+
+                ImGui::EndTabItem();
+            }
+
+            // Mining & Economy Tab
+            if (ImGui::BeginTabItem("Mining"))
+            {
+                ImGui::Checkbox("Straight Tunnel", &cfg::forwardTunnel);
+                ImGui::Checkbox("Seed-Ray", &cfg::oreSim);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##oresim")) cfg::oreSimcfg = !cfg::oreSimcfg;
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+		ImGui::PopStyleColor(3);
 
         ImGui::End();
-        ImGui::PopStyleVar(); // WindowBorderSize
+        ImGui::PopStyleVar();
         ImGui::PopStyleColor();
 
-        if (cfg::autoTotem) {
-			ImGui::Begin("Auto Totem");
+        if (cfg::chatFiltercfg) {
+			ImGui::Begin("Chat Filter", &cfg::chatFiltercfg);
+			if (cfg::filterMode != 0) ImGui::Text("Block Chat If: ");
+            if (ImGui::BeginCombo("Filter Mode", cfg::chatFilterItems[cfg::filterMode])) {
+                for (int n = 0; n < IM_ARRAYSIZE(cfg::chatFilterItems); n++) {
+                    bool isSelected = (cfg::filterMode == n);
+                    if (ImGui::Selectable(cfg::chatFilterItems[n], isSelected)) cfg::filterMode = n;
+                    if (isSelected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+			if (cfg::filterMode != 0)
+				ImGui::InputText("Message", cfg::blockMsg, IM_ARRAYSIZE(cfg::blockMsg));
+            ImGui::End();
+        }
+
+        if (cfg::autoDccfg) {
+            ImGui::Begin("Auto Disconnect", &cfg::autoDccfg);
+			ImGui::Text("Player Proximity Condition");
+            ImGui::InputFloat("##prox", &cfg::autoDcCondition, 0, 0, "%.1f");
+			if (ImGui::Button(cfg::autoDcPrimed ? "Primed, Disconnect Ready" : "Not Primed!")) cfg::autoDcPrimed = !cfg::autoDcPrimed;
+			ImGui::End();
+        }
+
+        if (cfg::autoSellcfg) {
+            ImGui::Begin("Auto Sell", &cfg::autoSellcfg);
+			ImGui::SliderInt("Delay (ms)", &cfg::autoSellDelay, 5, 500);
+            ImGui::InputText("Price", cfg::autoSellPrice, IM_ARRAYSIZE(cfg::autoSellPrice));
+			ImGui::Text("Endpoints:");
+			ImGui::InputInt("Start Slot", &cfg::autoSellEndpoints[0]);
+			ImGui::InputInt("Stop Slot", &cfg::autoSellEndpoints[1]);
+            if (ImGui::Button("Trigger Sell")) cfg::triggerAutoSell = true;
+			ImGui::End();
+
+			if (cfg::autoSellEndpoints[0] < 1) cfg::autoSellEndpoints[0] = 1;
+			if (cfg::autoSellEndpoints[0] > 9) cfg::autoSellEndpoints[0] = 9;
+			if (cfg::autoSellEndpoints[1] > 9) cfg::autoSellEndpoints[1] = 9;
+			if (cfg::autoSellEndpoints[1] < 1) cfg::autoSellEndpoints[1] = 1;
+        }
+
+        if (cfg::autoTotemcfg) {
+			ImGui::Begin("Auto Totem", &cfg::autoTotemcfg);
 			ImGui::Text("Auto Totem is enabled.");
 			ImGui::SliderInt("Delay (ms)", &cfg::autoTotemDelay, 5, 500);
 			ImGui::SliderInt("Humanity", &cfg::autoTotemHumanity, 0, 200);
 			ImGui::End();
         }
 
-        if (cfg::oreSim) {
+        if (cfg::oreSimcfg) {
             // Seed-Ray window with scanline effect
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.05f, 0.03f, 0.08f, 0.95f));
-            ImGui::Begin("Seed-Ray Config");
+            ImGui::Begin("Seed-Ray Config", &cfg::oreSimcfg);
 
             // Add scanline overlay
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -124,16 +211,16 @@ void RenderMain()
             ImGui::PopStyleColor();
         }
 
-        if (cfg::autoCrystal) {
-			ImGui::Begin("Auto Crystal");
+        if (cfg::autoCrystalcfg) {
+			ImGui::Begin("Auto Crystal", &cfg::autoCrystalcfg);
 			ImGui::Text("Auto Crystal is enabled.");
             ImGui::SliderInt("Attack Time (ms)", &cfg::crystalAttackTime, 5, 500);
 			ImGui::SliderInt("Place Time (ms)", &cfg::crystalPlaceTime, 5, 500);
 			ImGui::End();
         }
 
-        if (cfg::advEsp) {
-            ImGui::Begin("Advanced ESP");
+        if (cfg::advEspcfg) {
+            ImGui::Begin("Advanced ESP", &cfg::advEspcfg);
 
             ImGui::Text("ESP Settings:");
             ImGui::SliderInt("Esp Radius", &cfg::espRadius, 16, 128);
@@ -155,8 +242,6 @@ void RenderMain()
                         break;
                     }
                 }
-
-                // If the block does not exist, add it to the list
                 if (!exists) {
                     cfg::espBlockList.push_back(EspBlock(cfg::blockName, cfg::blockColor, true)); // Add the new block with color
                 }
@@ -235,7 +320,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
     }
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(1337);
+    serverAddr.sin_port = htons(getPort());
     serverAddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(listenSock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
@@ -309,7 +394,18 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["autoTotem"] = cfg::autoTotem;
 				config["autoTotemDelay"] = cfg::autoTotemDelay;
 				config["autoTotemHumanity"] = cfg::autoTotemHumanity;
+				config["autoSellDelay"] = cfg::autoSellDelay;
+				config["autoSellPrice"] = cfg::autoSellPrice;
+				config["triggerAutoSell"] = cfg::triggerAutoSell;
+				config["autoSellEndpointStart"] = cfg::autoSellEndpoints[0] -1;
+				config["autoSellEndpointStop"] = cfg::autoSellEndpoints[1] -1;
+				config["autoDcPrimed"] = cfg::autoDcPrimed;
+				config["autoDcCondition"] = cfg::autoDcCondition;
+                config["filterMode"] = cfg::filterMode;
+				config["chatFilter"] = cfg::chatFilter;
+				config["blockMsg"] = cfg::blockMsg;
 
+                cfg::triggerAutoSell = false;
                 json espBlocksJson = json::array();
                 for (const auto& block : cfg::espBlockList) {
                         espBlocksJson.push_back({
@@ -360,10 +456,6 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                                 if (name.is_string())
                                     cfg::nearbyPlayers.push_back(name.get<std::string>());
                             }
-
-                            for (const auto& name : cfg::nearbyPlayers) {
-                                std::cout << " - " << name << '\n';
-                            }
                         }
                     }
                 }
@@ -397,6 +489,19 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
                 }
             }
+            else if (message.find("autoDcPrimedDisable") != std::string::npos) {
+                try {
+                    size_t jsonStart = message.find_first_of('{');
+                    if (jsonStart != std::string::npos) {
+                        std::string jsonStr = message.substr(jsonStart);
+                        json renderJson = json::parse(jsonStr);
+                        cfg::autoDcPrimed = renderJson.value("autoDcPrimedDisable", false);
+                    }
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
+                }
+            }
         }
 
         Sleep(1);
@@ -407,13 +512,6 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
     WSACleanup();
     FreeLibraryAndExitThread((HMODULE)lpParam, 0);
     return 0;
-}
-
-std::string getMinecraftFolder() {
-    char appdata[MAX_PATH];
-    SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, appdata);
-    std::filesystem::path minecraftPath = std::filesystem::path(appdata) / ".minecraft";
-    return minecraftPath.string();
 }
 
 void saveSettings() {
@@ -437,6 +535,17 @@ void saveSettings() {
 	config["autoTotem"] = cfg::autoTotem;
 	config["autoTotemDelay"] = cfg::autoTotemDelay;
 	config["autoTotemHumanity"] = cfg::autoTotemHumanity;
+	config["autoSellDelay"] = cfg::autoSellDelay;
+	config["autoSellPrice"] = cfg::autoSellPrice;
+	config["autoSell"] = cfg::autoSell;
+	config["autoSellEndpointStart"] = cfg::autoSellEndpoints[0];
+	config["autoSellEndpointStop"] = cfg::autoSellEndpoints[1];
+	config["autoDc"] = cfg::autoDc;
+	config["autoDcCondition"] = cfg::autoDcCondition;
+	config["backgroundFx"] = cfg::backgroundFx;
+	config["filterMode"] = cfg::filterMode;
+	config["chatFilter"] = cfg::chatFilter;
+	config["blockMsg"] = cfg::blockMsg;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
@@ -485,6 +594,24 @@ void loadSettings() {
 		if (config.contains("autoTotem")) cfg::autoTotem = config["autoTotem"].get<bool>();
 		if (config.contains("autoTotemDelay")) cfg::autoTotemDelay = config["autoTotemDelay"].get<int>();
 		if (config.contains("autoTotemHumanity")) cfg::autoTotemHumanity = config["autoTotemHumanity"].get<int>();
+		if (config.contains("autoSellDelay")) cfg::autoSellDelay = config["autoSellDelay"].get<int>();
+		if (config.contains("autoSellPrice")) {
+			std::string price = config["autoSellPrice"].get<std::string>();
+			strncpy_s(cfg::autoSellPrice, price.c_str(), sizeof(cfg::autoSellPrice));
+		}
+		if (config.contains("autoSell")) cfg::autoSell = config["autoSell"].get<bool>();
+		if (config.contains("autoSellEndpointStart")) cfg::autoSellEndpoints[0] = config["autoSellEndpointStart"].get<int>();
+		if (config.contains("autoSellEndpointStop")) cfg::autoSellEndpoints[1] = config["autoSellEndpointStop"].get<int>();
+		if (config.contains("autoDc")) cfg::autoDc = config["autoDc"].get<bool>();
+		if (config.contains("autoDcCondition")) cfg::autoDcCondition = config["autoDcCondition"].get<float>();
+		if (config.contains("backgroundFx")) cfg::backgroundFx = config["backgroundFx"].get<bool>();
+		if (config.contains("filterMode")) cfg::filterMode = config["filterMode"].get<int>();
+		if (config.contains("chatFilter")) cfg::chatFilter = config["chatFilter"].get<bool>();
+        if (config.contains("blockMsg")) {
+            std::string msg = config["blockMsg"].get<std::string>();
+            strncpy_s(cfg::blockMsg, MAX_PATH, msg.c_str(), _TRUNCATE);
+        }
+
 
         // Load ESP blocks
         cfg::espBlockList.clear();
