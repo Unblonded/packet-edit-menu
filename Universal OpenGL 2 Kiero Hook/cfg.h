@@ -19,7 +19,10 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-// Forward declaration for EspBlock structure
+static ImVec4 defaultColor() {
+    return ImVec4(1.f, 1.f, 1.f, 1.f);
+}
+
 struct EspBlock {
     std::string name;
     ImVec4 color;
@@ -46,13 +49,14 @@ public:
     inline static bool drawBlocks;
     inline static bool drawBlockTracer;
     inline static char blockName[256];
-    inline static ImVec4 blockColor = ImVec4(1.f, 1.f, 1.f, 1.f);
+    inline static ImVec4 blockColor = defaultColor();
     inline static std::vector<EspBlock> espBlockList;
     inline static int espRadius;
     inline static int espBatchSize;
     inline static int espSearchTime;
     inline static bool checkPlayerAirSafety;
     inline static std::string isPlayerAirSafe;
+    inline static bool isPlayerAirSafeShowStatus;
     inline static bool forwardTunnel;
     inline static std::vector<std::string> nearbyPlayers;
     inline static std::string tunnelBlockStatus;
@@ -65,7 +69,7 @@ public:
     inline static long long oreSimSeed;
     inline static bool oreSim;
     inline static int oreSimDistance;
-    inline static ImVec4 oreSimColor;
+    inline static ImVec4 oreSimColor = defaultColor();
     inline static bool autoTotem;
     inline static int autoTotemDelay;
     inline static int autoTotemHumanity;
@@ -85,9 +89,22 @@ public:
     inline static bool fontSizeOverride;
 	inline static float fontSize = 1.f;
     inline static bool aimAssistToggle;
+    inline static bool storageScan;
+    inline static ImVec4 storageScanColor = defaultColor();
+    inline static char storageScanSearch[256] = "";
+    inline static bool storageScanShowInGui;
+    inline static bool storageScanShow;
+    inline static float aimAssistrange = 6.0f;
+    inline static float aimAssistfov = 60.0f;
+    inline static float aimAssistsmoothness = 1.5f;
+    inline static float aimAssistminSpeed = 90.0f;
+    inline static float aimAssistmaxSpeed = 100.0f;
+    inline static bool aimAssistvisibilityCheck = true;
+    inline static int aimAssistupdateRate = 10;
 
     inline static bool autoCrystalcfg;
 	inline static bool advEspcfg;
+    inline static bool checkPlayerAirSafetycfg;
 	inline static bool autoSellcfg;
 	inline static bool autoDccfg;
 	inline static bool oreSimcfg;
@@ -95,6 +112,7 @@ public:
 	inline static bool chatFiltercfg;
     inline static bool fontSizecfg;
 	inline static bool aimAssistcfg;
+	inline static bool storageScancfg;
 };
 
 static std::string getMinecraftFolder() {
@@ -125,6 +143,11 @@ static int getPort() {
 
     return 1337;
 }
+
+static std::array<float, 4> vec4Arr(const ImVec4& color) {
+    return { color.x, color.y, color.z, color.w };
+}
+
 
 static void RenderCustomShaders() {
     float time = static_cast<float>(ImGui::GetTime());

@@ -24,8 +24,13 @@ bool singleInit = false;
 
 void RenderMain()
 {
-	if (!cfg::showMenu) cfg::showMenuInitialized = false;
     if (!cfg::showAll) return;
+    if (!cfg::showMenu && !cfg::storageScanShowInGui) cfg::showMenuInitialized = false;
+
+	if (!cfg::showMenuInitialized) {
+        ImGui::SetWindowFocus(nullptr);
+        cfg::showMenuInitialized = true;
+    }
 
     static float pulse_speed = 3.5f;
     float pulse = 0.5f + 0.5f * sinf(static_cast<float>(ImGui::GetTime()) * pulse_speed);
@@ -38,9 +43,7 @@ void RenderMain()
         ImVec2 windowSize = ImGui::GetIO().DisplaySize;
         ImGui::GetIO().FontGlobalScale = (windowSize.x / 1920.0f) * 0.85f;
 	}
-	else {
-		ImGui::GetIO().FontGlobalScale = cfg::fontSize;
-    }
+	else ImGui::GetIO().FontGlobalScale = cfg::fontSize;
 
     if (cfg::showMenu) {
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(
@@ -106,9 +109,7 @@ void RenderMain()
             // Utility Tab
             if (ImGui::BeginTabItem("Utility"))
             {
-                ImGui::Checkbox(ICON_FA_HARD_HAT " Player Dig Safety", &cfg::checkPlayerAirSafety);
-
-                ImGui::Checkbox(ICON_FA_HAND_PAPER " Interaction Canceler", &cfg::cancelInteraction);
+            	ImGui::Checkbox(ICON_FA_HAND_PAPER " Interaction Canceler", &cfg::cancelInteraction);
 
                 ImGui::Checkbox(ICON_FA_PLUG " Auto Disconnect", &cfg::autoDc);
                 ImGui::SameLine();
@@ -122,13 +123,21 @@ void RenderMain()
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
 
+                ImGui::Checkbox(ICON_FA_BOX_OPEN " Storage Scan", &cfg::storageScan);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##storagescan")) cfg::storageScancfg = !cfg::storageScancfg;
+
                 ImGui::EndTabItem();
             }
 
             // Mining & Economy Tab
             if (ImGui::BeginTabItem("Mining"))
             {
-                ImGui::Checkbox(ICON_FA_ROUTE " Straight Tunnel", &cfg::forwardTunnel);
+                ImGui::Checkbox(ICON_FA_HARD_HAT " Player Dig Safety", &cfg::checkPlayerAirSafety);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##digsafety")) cfg::checkPlayerAirSafetycfg = !cfg::checkPlayerAirSafetycfg;
+
+            	ImGui::Checkbox(ICON_FA_ROUTE " Straight Tunnel", &cfg::forwardTunnel);
 
                 ImGui::Checkbox(ICON_FA_SEEDLING " Seed-Ray", &cfg::oreSim);
                 ImGui::SameLine();
@@ -149,7 +158,16 @@ void RenderMain()
 
         if (cfg::aimAssistcfg) {
             ImGui::Begin("Aim Assist", &cfg::aimAssistcfg);
-            
+            ImGui::Text("Aim Assist is %s", cfg::aimAssistToggle ? "enabled" : "disabled");
+
+            ImGui::SliderFloat("Range", &cfg::aimAssistrange, 1.0f, 20.0f, "%.1f");
+            ImGui::SliderFloat("Field of View", &cfg::aimAssistfov, 1.0f, 180.0f, "%.1f°");
+            ImGui::SliderFloat("Smoothness", &cfg::aimAssistsmoothness, 0.1f, 10.0f, "%.1f");
+            ImGui::SliderFloat("Min Speed", &cfg::aimAssistminSpeed, 1.0f, 360.0f, "%.1f°/s");
+            ImGui::SliderFloat("Max Speed", &cfg::aimAssistmaxSpeed, 1.0f, 360.0f, "%.1f°/s");
+            ImGui::Checkbox("Visibility Check", &cfg::aimAssistvisibilityCheck);
+            ImGui::SliderInt("Update Rate (ms)", &cfg::aimAssistupdateRate, 1, 1000);
+
             ImGui::End();
         }
 
@@ -255,6 +273,13 @@ void RenderMain()
 			ImGui::End();
         }
 
+        if (cfg::checkPlayerAirSafetycfg) {
+			ImGui::Begin("Player Dig Safety", &cfg::checkPlayerAirSafetycfg);
+			ImGui::Text("Player Dig Safety is %s", cfg::checkPlayerAirSafety ? "enabled" : "disabled");
+            ImGui::Checkbox("Show Status In-Game", &cfg::isPlayerAirSafeShowStatus);
+			ImGui::End();
+        }
+
         if (cfg::advEspcfg) {
             ImGui::Begin("Advanced ESP", &cfg::advEspcfg);
 
@@ -310,6 +335,16 @@ void RenderMain()
 
     }
 
+    if (cfg::storageScancfg || (cfg::storageScanShow && cfg::storageScanShowInGui)) {
+        if (!cfg::showMenu) cfg::storageScancfg = false;
+        ImGui::Begin("Storage Scan", &cfg::storageScancfg);
+        ImGui::Text("Storage Scan is %s", cfg::storageScan ? "enabled" : "disabled");
+        ImGui::ColorEdit4("Highlight Color", (float*)&cfg::storageScanColor, ImGuiColorEditFlags_NoInputs);
+        ImGui::InputText("Search For", cfg::storageScanSearch, IM_ARRAYSIZE(cfg::storageScanSearch));
+        ImGui::Checkbox("Show Config In Gui", &cfg::storageScanShowInGui);
+        ImGui::End();
+    }
+
     if (cfg::displayPlayers) {
         ImGui::Begin("Nearby Players");
         for (const auto& name : cfg::nearbyPlayers) {
@@ -318,7 +353,7 @@ void RenderMain()
         ImGui::End();
     }
 
-    if (cfg::checkPlayerAirSafety) {
+    if (cfg::checkPlayerAirSafety && cfg::isPlayerAirSafeShowStatus) {
 		ImGui::Begin("Dig Safety");
         ImGui::Text(cfg::isPlayerAirSafe.c_str());
 		ImGui::End();
@@ -328,11 +363,6 @@ void RenderMain()
         ImGui::Begin("Tunneling Status");
         ImGui::Text(cfg::tunnelBlockStatus.c_str());
         ImGui::End();
-    }
-
-    if (cfg::showMenu && !cfg::showMenuInitialized) {
-        ImGui::SetWindowFocus(nullptr); // Remove focus from any window
-        cfg::showMenuInitialized = true;
     }
 
     if (!singleInit) {
@@ -431,7 +461,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["oreSim"] = cfg::oreSim;
 				config["oreSimSeed"] = cfg::oreSimSeed;
 				config["oreSimDistance"] = cfg::oreSimDistance;
-				config["oreSimColor"] = { cfg::oreSimColor.x, cfg::oreSimColor.y, cfg::oreSimColor.z, cfg::oreSimColor.w };
+				config["oreSimColor"] = vec4Arr(cfg::oreSimColor);
 				config["autoTotem"] = cfg::autoTotem;
 				config["autoTotemDelay"] = cfg::autoTotemDelay;
 				config["autoTotemHumanity"] = cfg::autoTotemHumanity;
@@ -445,14 +475,25 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                 config["filterMode"] = cfg::filterMode;
 				config["chatFilter"] = cfg::chatFilter;
 				config["blockMsg"] = cfg::blockMsg;
-				config["aimAssistToggle"] = cfg::aimAssistToggle;
+                config["storageScan"] = cfg::storageScan;
+				config["storageScanSearch"] = cfg::storageScanSearch;
+				config["storageScanColor"] = vec4Arr(cfg::storageScanColor);
+                config["storageScanShowInGui"] = cfg::storageScanShowInGui;
+                config["aimAssistToggle"] = cfg::aimAssistToggle;
+				config["aimAssistRange"] = cfg::aimAssistrange;
+				config["aimAssistFov"] = cfg::aimAssistfov;
+				config["aimAssistSmoothness"] = cfg::aimAssistsmoothness;
+				config["aimAssistMinSpeed"] = cfg::aimAssistminSpeed;
+				config["aimAssistMaxSpeed"] = cfg::aimAssistmaxSpeed;
+				config["aimAssistUpdateRate"] = cfg::aimAssistupdateRate;
+                config["aimAssistVisibility"] = cfg::aimAssistvisibilityCheck;
 
                 cfg::triggerAutoSell = false;
                 json espBlocksJson = json::array();
                 for (const auto& block : cfg::espBlockList) {
                         espBlocksJson.push_back({
                             {"name", block.name},
-                            {"color", {block.color.x, block.color.y, block.color.z, block.color.w}},
+                            {"color", vec4Arr(block.color)},
 							{"enabled", block.enabled}
                             });
                 }
@@ -544,6 +585,19 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
                 }
             }
+            else if (message.find("sendGuiStorageScanner") != std::string::npos) {
+                try {
+                    size_t jsonStart = message.find_first_of('{');
+                    if (jsonStart != std::string::npos) {
+                        std::string jsonStr = message.substr(jsonStart);
+                        json renderJson = json::parse(jsonStr);
+                        cfg::storageScanShow = renderJson.value("sendGuiStorageScanner", false);
+                    }
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
+                }
+            }
         }
 
         Sleep(1);
@@ -572,7 +626,7 @@ void saveSettings() {
 	config["oreSim"] = cfg::oreSim;
 	config["oreSimSeed"] = cfg::oreSimSeed;
 	config["oreSimDistance"] = cfg::oreSimDistance;
-	config["oreSimColor"] = { cfg::oreSimColor.x, cfg::oreSimColor.y, cfg::oreSimColor.z, cfg::oreSimColor.w };
+	config["oreSimColor"] = vec4Arr(cfg::oreSimColor);
 	config["autoTotem"] = cfg::autoTotem;
 	config["autoTotemDelay"] = cfg::autoTotemDelay;
 	config["autoTotemHumanity"] = cfg::autoTotemHumanity;
@@ -590,12 +644,24 @@ void saveSettings() {
 	config["fontSizeOverride"] = cfg::fontSizeOverride;
 	config["fontSize"] = cfg::fontSize;
 	config["aimAssistToggle"] = cfg::aimAssistToggle;
+    config["storageScan"] = cfg::storageScan;
+    config["storageScanSearch"] = cfg::storageScanSearch;
+    config["storageScanColor"] = vec4Arr(cfg::storageScanColor);
+    config["storageScanShowInGui"] = cfg::storageScanShowInGui;
+    config["aimAssistToggle"] = cfg::aimAssistToggle;
+    config["aimAssistRange"] = cfg::aimAssistrange;
+    config["aimAssistFov"] = cfg::aimAssistfov;
+    config["aimAssistSmoothness"] = cfg::aimAssistsmoothness;
+    config["aimAssistMinSpeed"] = cfg::aimAssistminSpeed;
+    config["aimAssistMaxSpeed"] = cfg::aimAssistmaxSpeed;
+    config["aimAssistUpdateRate"] = cfg::aimAssistupdateRate;
+    config["aimAssistVisibility"] = cfg::aimAssistvisibilityCheck;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
         blocksJson.push_back({
             {"name", block.name},
-            {"color", {block.color.x, block.color.y, block.color.z, block.color.w}},
+            {"color", vec4Arr(block.color)},
 			{"enabled", block.enabled}
             });
     }
@@ -657,7 +723,22 @@ void loadSettings() {
         }
 		if (config.contains("fontSizeOverride")) cfg::fontSizeOverride = config["fontSizeOverride"].get<bool>();
 		if (config.contains("fontSize")) cfg::fontSize = config["fontSize"].get<float>();
-		if (config.contains("aimAssistToggle")) cfg::aimAssistToggle = config["aimAssistToggle"].get<bool>();
+		if (config.contains("storageScan")) cfg::storageScan = config["storageScan"].get<bool>();
+		if (config.contains("storageScanSearch")) {
+			std::string search = config["storageScanSearch"].get<std::string>();
+			strncpy_s(cfg::storageScanSearch, MAX_PATH, search.c_str(), _TRUNCATE);
+		}
+		if (config.contains("storageScanColor") && config["storageScanColor"].is_array() && config["storageScanColor"].size() == 4)
+			cfg::storageScanColor = ImVec4(config["storageScanColor"][0], config["storageScanColor"][1], config["storageScanColor"][2], config["storageScanColor"][3]);
+        if (config.contains("storageScanShowInGui")) cfg::storageScanShowInGui = config["storageScanShowInGui"].get<bool>();
+        if (config.contains("aimAssistToggle")) cfg::aimAssistToggle = config["aimAssistToggle"].get<bool>();
+    	if (config.contains("aimAssistRange")) cfg::aimAssistrange = config["aimAssistRange"].get<float>();
+		if (config.contains("aimAssistFov")) cfg::aimAssistfov = config["aimAssistFov"].get<float>();
+		if (config.contains("aimAssistSmoothness")) cfg::aimAssistsmoothness = config["aimAssistSmoothness"].get<float>();
+		if (config.contains("aimAssistMinSpeed")) cfg::aimAssistminSpeed = config["aimAssistMinSpeed"].get<float>();
+		if (config.contains("aimAssistMaxSpeed")) cfg::aimAssistmaxSpeed = config["aimAssistMaxSpeed"].get<float>();
+		if (config.contains("aimAssistUpdateRate")) cfg::aimAssistupdateRate = config["aimAssistUpdateRate"].get<int>();
+		if (config.contains("aimAssistVisibility")) cfg::aimAssistvisibilityCheck = config["aimAssistVisibility"].get<bool>();
 
 
         // Load ESP blocks
