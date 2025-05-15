@@ -77,11 +77,14 @@ public:
     inline static bool autoDc;
 	inline static bool autoDcPrimed;
 	inline static float autoDcCondition;
-	inline static bool backgroundFx;
+	inline static bool backgroundFx = true;
     inline static bool chatFilter;
     inline static const char* chatFilterItems[] = { "Mute", "Contains", "Not Contain" };
     inline static int filterMode = 0;
     inline static char blockMsg[MAX_PATH];
+    inline static bool fontSizeOverride;
+	inline static float fontSize = 1.f;
+    inline static bool aimAssistToggle;
 
     inline static bool autoCrystalcfg;
 	inline static bool advEspcfg;
@@ -90,6 +93,8 @@ public:
 	inline static bool oreSimcfg;
     inline static bool autoTotemcfg;
 	inline static bool chatFiltercfg;
+    inline static bool fontSizecfg;
+	inline static bool aimAssistcfg;
 };
 
 static std::string getMinecraftFolder() {
@@ -121,36 +126,8 @@ static int getPort() {
     return 1337;
 }
 
-// cURL callback for writing response
-static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
-    try {
-        ((std::string*)userp)->append((char*)contents, size * nmemb);
-        return size * nmemb;
-    }
-    catch (...) {
-        return 0; // Signal error to cURL
-    }
-}
-
-static std::string escapeJson(const std::string& input) {
-    std::string output;
-    for (char c : input) {
-        switch (c) {
-        case '"': output += "\\\""; break;
-        case '\\': output += "\\\\"; break;
-        case '\b': output += "\\b"; break;
-        case '\f': output += "\\f"; break;
-        case '\n': output += "\\n"; break;
-        case '\r': output += "\\r"; break;
-        case '\t': output += "\\t"; break;
-        default: output += c;
-        }
-    }
-    return output;
-}
-
 static void RenderCustomShaders() {
-    float time = ImGui::GetTime();
+    float time = static_cast<float>(ImGui::GetTime());
     float pulse = 0.5f + 0.5f * sinf(time * 3.5f);
     float pulse_fast = 0.5f + 0.5f * sinf(time * 8.0f);
     float flicker = 0.3f + 0.7f * fabsf(sinf(time * 20.0f));
@@ -220,7 +197,7 @@ static void RenderCustomShaders() {
     }
 
     // === Chromatic Aberration Glitch Lines ===
-    for (int y = 0; y < size.y; y += 120) {
+    for (float y = 0; y < size.y; y += 120) {
         bg->AddLine(ImVec2(0, y), ImVec2(size.x, y), IM_COL32(255, 50, 200, (int)(30 * alphaMultiplier)), 1.0f);
         bg->AddLine(ImVec2(2, y + 1), ImVec2(size.x + 2, y + 1), IM_COL32(0, 255, 255, (int)(30 * alphaMultiplier)), 1.0f);
         bg->AddLine(ImVec2(-2, y + 2), ImVec2(size.x - 2, y + 2), IM_COL32(0, 255, 100, (int)(20 * alphaMultiplier)), 1.0f);

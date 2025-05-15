@@ -19,22 +19,28 @@ namespace fs = std::filesystem;
 
 bool endloop = false;
 bool shouldUnload = false;
+bool singleInit = false;
 
 
 void RenderMain()
 {
-    if (!cfg::showMenu) cfg::showMenuInitialized = false;
+	if (!cfg::showMenu) cfg::showMenuInitialized = false;
     if (!cfg::showAll) return;
 
     static float pulse_speed = 3.5f;
-    float pulse = 0.5f + 0.5f * sinf(ImGui::GetTime() * pulse_speed);
-    float pulse_alt = 0.5f + 0.5f * cosf(ImGui::GetTime() * pulse_speed * 0.8f);
+    float pulse = 0.5f + 0.5f * sinf(static_cast<float>(ImGui::GetTime()) * pulse_speed);
+    float pulse_alt = 0.5f + 0.5f * cosf(static_cast<float>(ImGui::GetTime()) * pulse_speed * 0.8f);
     ImVec4 neon_pink = ImVec4(1.0f, 0.1f, 0.6f, 1.0f);
     ImVec4 neon_blue = ImVec4(0.1f, 0.9f, 1.0f, 1.0f);
     ImVec4 neon_purple = ImVec4(0.7f, 0.3f, 1.0f, 1.0f);
 
-    ImVec2 windowSize = ImGui::GetIO().DisplaySize;
-    ImGui::GetIO().FontGlobalScale = (windowSize.x / 1920.0f) * 0.85f;
+    if (!cfg::fontSizeOverride) {
+        ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+        ImGui::GetIO().FontGlobalScale = (windowSize.x / 1920.0f) * 0.85f;
+	}
+	else {
+		ImGui::GetIO().FontGlobalScale = cfg::fontSize;
+    }
 
     if (cfg::showMenu) {
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(
@@ -72,6 +78,10 @@ void RenderMain()
 
                 ImGui::Checkbox("Auto Anchor", &cfg::autoAnchor);
 
+                ImGui::Checkbox("Aim Assist", &cfg::aimAssistToggle);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##aimAssist")) cfg::aimAssistcfg = !cfg::aimAssistcfg;
+
                 ImGui::EndTabItem();
             }
 
@@ -79,7 +89,10 @@ void RenderMain()
             // ESP & Visual Tab
             if (ImGui::BeginTabItem("Visuals"))
             {
-                ImGui::Checkbox("Show Player List", &cfg::displayPlayers);
+                ImGui::Checkbox("Font Size Override", &cfg::fontSizeOverride);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##fontsize")) cfg::fontSizecfg = !cfg::fontSizecfg;
+            	ImGui::Checkbox("Show Player List", &cfg::displayPlayers);
                 ImGui::Checkbox("Advanced ESP", &cfg::advEsp);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##advesp")) cfg::advEspcfg = !cfg::advEspcfg;
@@ -124,6 +137,19 @@ void RenderMain()
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
 
+        if (cfg::aimAssistcfg) {
+            ImGui::Begin("Aim Assist", &cfg::aimAssistcfg);
+            
+            ImGui::End();
+        }
+
+        if (cfg::fontSizecfg) {
+			ImGui::Begin("Font Size Override", &cfg::fontSizecfg);
+			ImGui::Text("Use a custom font size.");
+			ImGui::SliderFloat("Font Size", &cfg::fontSize, 0.25f, 4.0f);
+			ImGui::End();
+        }
+
         if (cfg::chatFiltercfg) {
 			ImGui::Begin("Chat Filter", &cfg::chatFiltercfg);
 			if (cfg::filterMode != 0) ImGui::Text("Block Chat If: ");
@@ -167,7 +193,7 @@ void RenderMain()
 
         if (cfg::autoTotemcfg) {
 			ImGui::Begin("Auto Totem", &cfg::autoTotemcfg);
-			ImGui::Text("Auto Totem is enabled.");
+			ImGui::Text("Auto Totem is %s", cfg::autoTotem ? "enabled" : "disabled");
 			ImGui::SliderInt("Delay (ms)", &cfg::autoTotemDelay, 5, 500);
 			ImGui::SliderInt("Humanity", &cfg::autoTotemHumanity, 0, 200);
 			ImGui::End();
@@ -190,7 +216,7 @@ void RenderMain()
                 );
             }
 
-            ImGui::TextColored(neon_blue, "Seed-Ray is enabled");
+            ImGui::TextColored(neon_blue, "Seed-Ray is %s", cfg::oreSim ? "enabled" : "disabled");
             if (cfg::oreSimDistance > 8)
                 ImGui::TextColored(neon_pink, "Warning: High render distance may use lots of CPU");
 
@@ -213,7 +239,7 @@ void RenderMain()
 
         if (cfg::autoCrystalcfg) {
 			ImGui::Begin("Auto Crystal", &cfg::autoCrystalcfg);
-			ImGui::Text("Auto Crystal is enabled.");
+            ImGui::Text("Auto Crystal is %s", cfg::autoCrystal ? "enabled" : "disabled");
             ImGui::SliderInt("Attack Time (ms)", &cfg::crystalAttackTime, 5, 500);
 			ImGui::SliderInt("Place Time (ms)", &cfg::crystalPlaceTime, 5, 500);
 			ImGui::End();
@@ -224,7 +250,7 @@ void RenderMain()
 
             ImGui::Text("ESP Settings:");
             ImGui::SliderInt("Esp Radius", &cfg::espRadius, 16, 128);
-            ImGui::SliderInt("Batch Size x1K", &cfg::espBatchSize, 50, 400);
+            ImGui::SliderInt("Batch Size x1K", &cfg::espBatchSize, 50, 1000);
             ImGui::SliderInt("Search Time (sec)", &cfg::espSearchTime, 0, 20);
             ImGui::Checkbox("Draw Blocks", &cfg::drawBlocks);
             if (cfg::drawBlocks) ImGui::Checkbox("Draw Tracers", &cfg::drawBlockTracer);
@@ -297,6 +323,11 @@ void RenderMain()
     if (cfg::showMenu && !cfg::showMenuInitialized) {
         ImGui::SetWindowFocus(nullptr); // Remove focus from any window
         cfg::showMenuInitialized = true;
+    }
+
+    if (!singleInit) {
+        // use if u need it
+        singleInit = true;
     }
 }
 
@@ -404,6 +435,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                 config["filterMode"] = cfg::filterMode;
 				config["chatFilter"] = cfg::chatFilter;
 				config["blockMsg"] = cfg::blockMsg;
+				config["aimAssistToggle"] = cfg::aimAssistToggle;
 
                 cfg::triggerAutoSell = false;
                 json espBlocksJson = json::array();
@@ -417,7 +449,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                 config["espBlockList"] = espBlocksJson;
 
                 std::string response = config.dump() + "\n";
-                int remaining = response.length();
+                int remaining = static_cast<int>(response.length());
                 const char* ptr = response.c_str();
                 while (remaining > 0) {
                     int sent = send(clientSock, ptr, remaining, 0);
@@ -546,6 +578,9 @@ void saveSettings() {
 	config["filterMode"] = cfg::filterMode;
 	config["chatFilter"] = cfg::chatFilter;
 	config["blockMsg"] = cfg::blockMsg;
+	config["fontSizeOverride"] = cfg::fontSizeOverride;
+	config["fontSize"] = cfg::fontSize;
+	config["aimAssistToggle"] = cfg::aimAssistToggle;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
@@ -611,6 +646,9 @@ void loadSettings() {
             std::string msg = config["blockMsg"].get<std::string>();
             strncpy_s(cfg::blockMsg, MAX_PATH, msg.c_str(), _TRUNCATE);
         }
+		if (config.contains("fontSizeOverride")) cfg::fontSizeOverride = config["fontSizeOverride"].get<bool>();
+		if (config.contains("fontSize")) cfg::fontSize = config["fontSize"].get<float>();
+		if (config.contains("aimAssistToggle")) cfg::aimAssistToggle = config["aimAssistToggle"].get<bool>();
 
 
         // Load ESP blocks
