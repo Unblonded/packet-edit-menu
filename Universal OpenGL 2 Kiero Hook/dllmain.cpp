@@ -68,52 +68,59 @@ void RenderMain()
             // Combat & PvP Tab
             if (ImGui::BeginTabItem("Combat"))
             {
-                ImGui::Checkbox("Auto Crystal", &cfg::autoCrystal);
+                ImGui::Checkbox(ICON_FA_GEM " Auto Crystal", &cfg::autoCrystal);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##crystal")) cfg::autoCrystalcfg = !cfg::autoCrystalcfg;
 
-                ImGui::Checkbox("Auto Totem", &cfg::autoTotem);
+                ImGui::Checkbox(ICON_FA_SHIELD_ALT " Auto Totem", &cfg::autoTotem);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##totem")) cfg::autoTotemcfg = !cfg::autoTotemcfg;
 
-                ImGui::Checkbox("Auto Anchor", &cfg::autoAnchor);
+                ImGui::Checkbox(ICON_FA_BOMB " Auto Anchor", &cfg::autoAnchor);
 
-                ImGui::Checkbox("Aim Assist", &cfg::aimAssistToggle);
+                ImGui::Checkbox(ICON_FA_CROSSHAIRS " Aim Assist", &cfg::aimAssistToggle);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##aimAssist")) cfg::aimAssistcfg = !cfg::aimAssistcfg;
 
                 ImGui::EndTabItem();
             }
 
-
             // ESP & Visual Tab
             if (ImGui::BeginTabItem("Visuals"))
             {
-                ImGui::Checkbox("Font Size Override", &cfg::fontSizeOverride);
+                ImGui::Checkbox(ICON_FA_TEXT_HEIGHT " Font Size Override", &cfg::fontSizeOverride);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##fontsize")) cfg::fontSizecfg = !cfg::fontSizecfg;
-            	ImGui::Checkbox("Show Player List", &cfg::displayPlayers);
-                ImGui::Checkbox("Advanced ESP", &cfg::advEsp);
+
+                ImGui::Checkbox(ICON_FA_USERS " Show Player List", &cfg::displayPlayers);
+
+                ImGui::Checkbox(ICON_FA_EYE " Advanced ESP", &cfg::advEsp);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##advesp")) cfg::advEspcfg = !cfg::advEspcfg;
-				ImGui::Checkbox("Show Background Effects", &cfg::backgroundFx);
+
+                ImGui::Checkbox(ICON_FA_IMAGE " Show Background Effects", &cfg::backgroundFx);
+
                 ImGui::EndTabItem();
             }
 
             // Utility Tab
             if (ImGui::BeginTabItem("Utility"))
             {
-                ImGui::Checkbox("Player Dig Safety", &cfg::checkPlayerAirSafety);
-                ImGui::Checkbox("Interaction Canceler", &cfg::cancelInteraction);
-                ImGui::Checkbox("Auto Disconnect", &cfg::autoDc);
+                ImGui::Checkbox(ICON_FA_HARD_HAT " Player Dig Safety", &cfg::checkPlayerAirSafety);
+
+                ImGui::Checkbox(ICON_FA_HAND_PAPER " Interaction Canceler", &cfg::cancelInteraction);
+
+                ImGui::Checkbox(ICON_FA_PLUG " Auto Disconnect", &cfg::autoDc);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##autodc")) cfg::autoDccfg = !cfg::autoDccfg;
-                ImGui::Checkbox("Auto Sell", &cfg::autoSell);
-				ImGui::SameLine();
-				if (ImGui::Button(ICON_FA_COGS "##autosell")) cfg::autoSellcfg = !cfg::autoSellcfg;
-				ImGui::Checkbox("Chat Filter", &cfg::chatFilter);
-				ImGui::SameLine();
-				if (ImGui::Button(ICON_FA_COGS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
+
+                ImGui::Checkbox(ICON_FA_DOLLAR_SIGN " Auto Sell", &cfg::autoSell);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##autosell")) cfg::autoSellcfg = !cfg::autoSellcfg;
+
+                ImGui::Checkbox(ICON_FA_COMMENT_SLASH " Chat Filter", &cfg::chatFilter);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
 
                 ImGui::EndTabItem();
             }
@@ -121,15 +128,18 @@ void RenderMain()
             // Mining & Economy Tab
             if (ImGui::BeginTabItem("Mining"))
             {
-                ImGui::Checkbox("Straight Tunnel", &cfg::forwardTunnel);
-                ImGui::Checkbox("Seed-Ray", &cfg::oreSim);
+                ImGui::Checkbox(ICON_FA_ROUTE " Straight Tunnel", &cfg::forwardTunnel);
+
+                ImGui::Checkbox(ICON_FA_SEEDLING " Seed-Ray", &cfg::oreSim);
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##oresim")) cfg::oreSimcfg = !cfg::oreSimcfg;
+
                 ImGui::EndTabItem();
             }
 
             ImGui::EndTabBar();
         }
+
 
 		ImGui::PopStyleColor(3);
 
@@ -543,7 +553,6 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
     closesocket(listenSock);
     WSACleanup();
     FreeLibraryAndExitThread((HMODULE)lpParam, 0);
-    return 0;
 }
 
 void saveSettings() {
