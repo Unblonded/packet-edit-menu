@@ -44,7 +44,7 @@ void RenderMain()
 
     if (!cfg::fontSizeOverride) {
         ImVec2 windowSize = ImGui::GetIO().DisplaySize;
-        ImGui::GetIO().FontGlobalScale = (windowSize.x / 1920.0f) * 0.85f;
+        ImGui::GetIO().FontGlobalScale = max(1.f, ((windowSize.x / 1920.0f) * 0.85f));
 	}
 	else ImGui::GetIO().FontGlobalScale = cfg::fontSize;
 
@@ -543,105 +543,54 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     ptr += sent;
                 }
             }
-            else if (message.find("RENDER_FLAG") != std::string::npos) {
+            else if (message.find("STATUS") != std::string::npos) {
                 try {
                     size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json renderJson = json::parse(jsonStr);
-                        cfg::showMenu = renderJson.value("shouldRender", false);
-                        cfg::showAll = renderJson.value("worldReady", false);
-                    }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
-                }
-            }
-            else if (message.find("PLAYERS") != std::string::npos) {
-                try {
-                    size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json playerJson = json::parse(jsonStr);
 
-                        if (playerJson.contains("PLAYERS") && playerJson["PLAYERS"].is_array()) {
-                            cfg::nearbyPlayers.clear();
-                            for (const auto& name : playerJson["PLAYERS"]) {
-                                if (name.is_string())
-                                    cfg::nearbyPlayers.push_back(name.get<std::string>());
-                            }
+                    std::string jsonStr = message.substr(jsonStart);
+                    json data = json::parse(jsonStr);
+
+                    // Render flags
+                    cfg::showMenu = data.value("shouldRender", false);
+                    cfg::showAll = data.value("worldReady", false);
+
+                    // Player safety
+                    cfg::isPlayerAirSafe = data.value("playerAirSafety", "");
+
+                    // Tunnel block status
+                    cfg::tunnelBlockStatus = data.value("tunnelBlockStatus", "");
+
+                    // GUI Scanner
+                    cfg::storageScanShow = data.value("sendGuiStorageScanner", false);
+
+                    // Crosshair
+                    cfg::nightFxDraw = data.value("sendCrosshairDraw", false);
+
+                    // Player list
+                    if (data.contains("PLAYERS") && data["PLAYERS"].is_array()) {
+                        cfg::nearbyPlayers.clear();
+                        for (const auto& name : data["PLAYERS"]) {
+                            if (name.is_string())
+                                cfg::nearbyPlayers.push_back(name.get<std::string>());
                         }
                     }
                 }
                 catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse player list: " << e.what() << "\n";
-                }
-            }
-            else if (message.find("playerAirSafety") != std::string::npos) {
-                try {
-                    size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json result = json::parse(jsonStr);
-                        cfg::isPlayerAirSafe = result.value("playerAirSafety", "");
-                    }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
-                }
-            }
-            else if (message.find("tunnelBlockStatus") != std::string::npos) {
-                try {
-                    size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json result = json::parse(jsonStr);
-                        cfg::tunnelBlockStatus = result.value("tunnelBlockStatus", "");
-                    }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
+                    std::cerr << "[TCP] Failed to parse STATUS message: " << e.what() << "\n";
                 }
             }
             else if (message.find("autoDcPrimedDisable") != std::string::npos) {
                 try {
                     size_t jsonStart = message.find_first_of('{');
                     if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json renderJson = json::parse(jsonStr);
+                        json renderJson = json::parse(message.substr(jsonStart));
                         cfg::autoDcPrimed = renderJson.value("autoDcPrimedDisable", false);
                     }
                 }
                 catch (const std::exception& e) {
                     std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
                 }
-            }
-            else if (message.find("sendGuiStorageScanner") != std::string::npos) {
-                try {
-                    size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json renderJson = json::parse(jsonStr);
-                        cfg::storageScanShow = renderJson.value("sendGuiStorageScanner", false);
-                    }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
-                }
-            }
-            else if (message.find("sendCrosshairDraw") != std::string::npos) {
-                try {
-                    size_t jsonStart = message.find_first_of('{');
-                    if (jsonStart != std::string::npos) {
-                        std::string jsonStr = message.substr(jsonStart);
-                        json renderJson = json::parse(jsonStr);
-                        cfg::nightFxDraw = renderJson.value("sendCrosshairDraw", false);
-                    }
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
-                }
-            }
+			}
         }
 
         Sleep(1);

@@ -331,10 +331,10 @@ static void CosmicCrosshair() {
     }
 
     // Portal center glow - this is the center of the crosshair
-    drawList->AddCircleFilled(center, radius * 0.3f,
-        IM_COL32(120, 255, 180, 120));
-    drawList->AddCircleFilled(center, radius * 0.15f,
-        IM_COL32(220, 255, 220, 180));
+    //drawList->AddCircleFilled(center, radius * 0.3f,
+    //    IM_COL32(120, 255, 180, 120));
+	//drawList->AddCircleFilled(center, radius * 0.15f,
+    //    IM_COL32(220, 255, 220, 180));
 
     // Optional: Add cardinal crosshair lines for better targeting
     // These lines help with precise aiming while keeping the cosmic effect

@@ -273,7 +273,7 @@ namespace ImGuiHook
 		render();
 
 		if (cfg::showMenu && cfg::backgroundFx) RenderCustomShaders();
-		if (!cfg::showMenu && (cfg::nightFx && cfg::nightFxDraw)) CosmicCrosshair();
+		if (cfg::nightFx && cfg::nightFxDraw) CosmicCrosshair();
 
 		ImGui::EndFrame();
 		ImGui::Render();
