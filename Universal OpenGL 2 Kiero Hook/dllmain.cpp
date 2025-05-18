@@ -11,6 +11,9 @@
 #include <filesystem>
 #include "cfg.h"
 #include "IconsFontAwesome5.h"
+#include "include/imgui/imgui_impl_opengl2.h"
+#include "include/imgui/imgui_impl_win32.h"
+#include "include/kiero/kiero.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -69,7 +72,7 @@ void RenderMain()
         if (ImGui::BeginTabBar("MainTabBar", ImGuiTabBarFlags_None))
         {
             // Combat & PvP Tab
-            if (ImGui::BeginTabItem("Combat"))
+            if (ImGui::BeginTabItem(ICON_FA_CROSSHAIRS " Combat"))
             {
                 ImGui::Checkbox(ICON_FA_GEM " Auto Crystal", &cfg::autoCrystal);
                 ImGui::SameLine();
@@ -85,11 +88,15 @@ void RenderMain()
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_COGS "##aimAssist")) cfg::aimAssistcfg = !cfg::aimAssistcfg;
 
+                ImGui::Checkbox(ICON_FA_BOMB " Crystal Spam", &cfg::crystalSpam);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##crystalspam")) cfg::crystalSpamcfg = !cfg::crystalSpamcfg;
+
                 ImGui::EndTabItem();
             }
 
             // ESP & Visual Tab
-            if (ImGui::BeginTabItem("Visuals"))
+            if (ImGui::BeginTabItem(ICON_FA_EYE " Visuals"))
             {
                 ImGui::Checkbox(ICON_FA_TEXT_HEIGHT " Font Size Override", &cfg::fontSizeOverride);
                 ImGui::SameLine();
@@ -103,11 +110,15 @@ void RenderMain()
 
                 ImGui::Checkbox(ICON_FA_IMAGE " Show Background Effects", &cfg::backgroundFx);
 
+				ImGui::Checkbox(ICON_FA_STAR " Show Cosmic Crosshair", &cfg::nightFx);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_COGS "##crosshair")) cfg::nightFxcfg = !cfg::nightFxcfg;
+
                 ImGui::EndTabItem();
             }
 
             // Utility Tab
-            if (ImGui::BeginTabItem("Utility"))
+            if (ImGui::BeginTabItem(ICON_FA_TOOLBOX " Utility"))
             {
             	ImGui::Checkbox(ICON_FA_HAND_PAPER " Interaction Canceler", &cfg::cancelInteraction);
 
@@ -131,7 +142,7 @@ void RenderMain()
             }
 
             // Mining & Economy Tab
-            if (ImGui::BeginTabItem("Mining"))
+            if (ImGui::BeginTabItem(ICON_FA_GEM " Mining"))
             {
                 ImGui::Checkbox(ICON_FA_HARD_HAT " Player Dig Safety", &cfg::checkPlayerAirSafety);
                 ImGui::SameLine();
@@ -156,15 +167,31 @@ void RenderMain()
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
 
+        if (cfg::nightFxcfg) {
+			ImGui::Begin("Cosmic Crosshair", &cfg::nightFxcfg);
+			ImGui::Text("Cosmic Crosshair is %s", cfg::nightFx ? "enabled" : "disabled");
+			ImGui::SliderFloat("Size", &cfg::nightFxSize, 1.0f, 100.0f);
+			ImGui::Checkbox("Show Crosshair Lines", &cfg::nightFxCrosshairLines);
+			ImGui::End();
+        }
+
+        if (cfg::crystalSpamcfg) {
+			ImGui::Begin("Crystal Spam", &cfg::crystalSpamcfg);
+			ImGui::Text("Crystal Spam is %s", cfg::crystalSpam ? "enabled" : "disabled");
+			ImGui::SliderInt("Search Radius", &cfg::crystalSpamSearchRadius, 1, 6);
+			ImGui::SliderInt("Break Delay (ms)", &cfg::crystalSpamBreakDelay, 1, 1000);
+			ImGui::End();
+        }
+
         if (cfg::aimAssistcfg) {
             ImGui::Begin("Aim Assist", &cfg::aimAssistcfg);
             ImGui::Text("Aim Assist is %s", cfg::aimAssistToggle ? "enabled" : "disabled");
 
             ImGui::SliderFloat("Range", &cfg::aimAssistrange, 1.0f, 20.0f, "%.1f");
-            ImGui::SliderFloat("Field of View", &cfg::aimAssistfov, 1.0f, 180.0f, "%.1f°");
+            ImGui::SliderFloat("Field of View", &cfg::aimAssistfov, 1.0f, 180.0f, "%.1f");
             ImGui::SliderFloat("Smoothness", &cfg::aimAssistsmoothness, 0.1f, 10.0f, "%.1f");
-            ImGui::SliderFloat("Min Speed", &cfg::aimAssistminSpeed, 1.0f, 360.0f, "%.1f°/s");
-            ImGui::SliderFloat("Max Speed", &cfg::aimAssistmaxSpeed, 1.0f, 360.0f, "%.1f°/s");
+            ImGui::SliderFloat("Min Speed", &cfg::aimAssistminSpeed, 1.0f, 360.0f, "%.1f/s");
+            ImGui::SliderFloat("Max Speed", &cfg::aimAssistmaxSpeed, 1.0f, 360.0f, "%.1f/s");
             ImGui::Checkbox("Visibility Check", &cfg::aimAssistvisibilityCheck);
             ImGui::SliderInt("Update Rate (ms)", &cfg::aimAssistupdateRate, 1, 1000);
 
@@ -487,6 +514,10 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["aimAssistMaxSpeed"] = cfg::aimAssistmaxSpeed;
 				config["aimAssistUpdateRate"] = cfg::aimAssistupdateRate;
                 config["aimAssistVisibility"] = cfg::aimAssistvisibilityCheck;
+                config["crystalSpam"] = cfg::crystalSpam;
+				config["crystalSpamSearchRadius"] = cfg::crystalSpamSearchRadius;
+				config["crystalSpamBreakDelay"] = cfg::crystalSpamBreakDelay;
+				config["nightFx"] = cfg::nightFx;
 
                 cfg::triggerAutoSell = false;
                 json espBlocksJson = json::array();
@@ -598,6 +629,19 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
                 }
             }
+            else if (message.find("sendCrosshairDraw") != std::string::npos) {
+                try {
+                    size_t jsonStart = message.find_first_of('{');
+                    if (jsonStart != std::string::npos) {
+                        std::string jsonStr = message.substr(jsonStart);
+                        json renderJson = json::parse(jsonStr);
+                        cfg::nightFxDraw = renderJson.value("sendCrosshairDraw", false);
+                    }
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
+                }
+            }
         }
 
         Sleep(1);
@@ -656,6 +700,12 @@ void saveSettings() {
     config["aimAssistMaxSpeed"] = cfg::aimAssistmaxSpeed;
     config["aimAssistUpdateRate"] = cfg::aimAssistupdateRate;
     config["aimAssistVisibility"] = cfg::aimAssistvisibilityCheck;
+    config["crystalSpam"] = cfg::crystalSpam;
+    config["crystalSpamSearchRadius"] = cfg::crystalSpamSearchRadius;
+    config["crystalSpamBreakDelay"] = cfg::crystalSpamBreakDelay;
+	config["nightFx"] = cfg::nightFx;
+	config["nightFxSize"] = cfg::nightFxSize;
+	config["nightFxCrosshairLines"] = cfg::nightFxCrosshairLines;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
@@ -739,6 +789,12 @@ void loadSettings() {
 		if (config.contains("aimAssistMaxSpeed")) cfg::aimAssistmaxSpeed = config["aimAssistMaxSpeed"].get<float>();
 		if (config.contains("aimAssistUpdateRate")) cfg::aimAssistupdateRate = config["aimAssistUpdateRate"].get<int>();
 		if (config.contains("aimAssistVisibility")) cfg::aimAssistvisibilityCheck = config["aimAssistVisibility"].get<bool>();
+		if (config.contains("crystalSpam")) cfg::crystalSpam = config["crystalSpam"].get<bool>();
+		if (config.contains("crystalSpamSearchRadius")) cfg::crystalSpamSearchRadius = config["crystalSpamSearchRadius"].get<int>();
+		if (config.contains("crystalSpamBreakDelay")) cfg::crystalSpamBreakDelay = config["crystalSpamBreakDelay"].get<int>();
+		if (config.contains("nightFx")) cfg::nightFx = config["nightFx"].get<bool>();
+		if (config.contains("nightFxSize")) cfg::nightFxSize = config["nightFxSize"].get<float>();
+		if (config.contains("nightFxCrosshairLines")) cfg::nightFxCrosshairLines = config["nightFxCrosshairLines"].get<bool>();
 
 
         // Load ESP blocks
@@ -758,7 +814,6 @@ void loadSettings() {
     }
     catch (...) { }
 }
-
 
 DWORD WINAPI InfoThread(LPVOID lpParam)
 {

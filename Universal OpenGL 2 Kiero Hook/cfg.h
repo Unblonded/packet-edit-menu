@@ -44,63 +44,71 @@ public:
     // inline static configuration variables
     inline static bool showMenu;
     inline static bool showAll;
-    inline static bool displayPlayers;
-    inline static bool advEsp;
-    inline static bool drawBlocks;
-    inline static bool drawBlockTracer;
+    inline static bool displayPlayers = false;
+    inline static bool advEsp = false;
+    inline static bool drawBlocks = true;
+    inline static bool drawBlockTracer = true;
     inline static char blockName[256];
     inline static ImVec4 blockColor = defaultColor();
     inline static std::vector<EspBlock> espBlockList;
-    inline static int espRadius;
-    inline static int espBatchSize;
-    inline static int espSearchTime;
-    inline static bool checkPlayerAirSafety;
+    inline static int espRadius = 24;
+    inline static int espBatchSize = 512;
+    inline static int espSearchTime = 5;
+    inline static bool checkPlayerAirSafety = false;
     inline static std::string isPlayerAirSafe;
     inline static bool isPlayerAirSafeShowStatus;
     inline static bool forwardTunnel;
     inline static std::vector<std::string> nearbyPlayers;
     inline static std::string tunnelBlockStatus;
     inline static bool autoCrystal;
-    inline static int crystalAttackTime;
-    inline static int crystalPlaceTime;
-    inline static bool cancelInteraction;
+    inline static int crystalAttackTime = 96;
+    inline static int crystalPlaceTime = 105;
+    inline static bool cancelInteraction = false;
     inline static bool showMenuInitialized;
-    inline static bool autoAnchor;
-    inline static long long oreSimSeed;
-    inline static bool oreSim;
-    inline static int oreSimDistance;
-    inline static ImVec4 oreSimColor = defaultColor();
-    inline static bool autoTotem;
-    inline static int autoTotemDelay;
-    inline static int autoTotemHumanity;
+    inline static bool autoAnchor = true;
+    inline static long long oreSimSeed = 6608149111735331168LL;
+    inline static bool oreSim = false;
+    inline static int oreSimDistance = 5;
+    inline static ImVec4 oreSimColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    inline static bool autoTotem = true;
+    inline static int autoTotemDelay = 84;
+    inline static int autoTotemHumanity = 29;
     inline static bool triggerAutoSell;
-	inline static bool autoSell;
-    inline static int autoSellDelay;
-	inline static char autoSellPrice[256] = "";
-    inline static int autoSellEndpoints[2] = { 1, 9 };
-    inline static bool autoDc;
-	inline static bool autoDcPrimed;
-	inline static float autoDcCondition;
-	inline static bool backgroundFx = true;
-    inline static bool chatFilter;
+    inline static bool autoSell = false;
+    inline static int autoSellDelay = 227;
+    inline static char autoSellPrice[256] = "";
+    inline static int autoSellEndpoints[2] = { 7, 9 };
+    inline static bool autoDc = false;
+    inline static bool autoDcPrimed;
+    inline static float autoDcCondition = 5.0f;
+    inline static bool backgroundFx = true;
+    inline static bool chatFilter = true;
     inline static const char* chatFilterItems[] = { "Mute", "Contains", "Not Contain" };
-    inline static int filterMode = 0;
-    inline static char blockMsg[MAX_PATH];
-    inline static bool fontSizeOverride;
-	inline static float fontSize = 1.f;
-    inline static bool aimAssistToggle;
-    inline static bool storageScan;
-    inline static ImVec4 storageScanColor = defaultColor();
+    inline static int filterMode = 2;
+    inline static char blockMsg[MAX_PATH] = "";
+    inline static bool fontSizeOverride = false;
+    inline static float fontSize = 2.592f;
+    inline static bool aimAssistToggle = false;
+    inline static bool storageScan = true;
+    inline static ImVec4 storageScanColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
     inline static char storageScanSearch[256] = "";
-    inline static bool storageScanShowInGui;
+    inline static bool storageScanShowInGui = true;
     inline static bool storageScanShow;
-    inline static float aimAssistrange = 6.0f;
-    inline static float aimAssistfov = 60.0f;
-    inline static float aimAssistsmoothness = 1.5f;
-    inline static float aimAssistminSpeed = 90.0f;
-    inline static float aimAssistmaxSpeed = 100.0f;
+    inline static float aimAssistrange = 6.800000190734863f;
+    inline static float aimAssistfov = 128.1999969482422f;
+    inline static float aimAssistsmoothness = 1.0f;
+    inline static float aimAssistminSpeed = 143.0f;
+    inline static float aimAssistmaxSpeed = 146.0f;
     inline static bool aimAssistvisibilityCheck = true;
-    inline static int aimAssistupdateRate = 10;
+    inline static int aimAssistupdateRate = 1;
+    inline static bool crystalSpam = false;
+    inline static int crystalSpamSearchRadius = 2;
+    inline static int crystalSpamBreakDelay = 118;
+    inline static bool nightFx = false;
+    inline static float nightFxSize = 20.f;
+    inline static bool nightFxDraw;
+	inline static bool nightFxCrosshairLines = true;
+
 
     inline static bool autoCrystalcfg;
 	inline static bool advEspcfg;
@@ -113,6 +121,8 @@ public:
     inline static bool fontSizecfg;
 	inline static bool aimAssistcfg;
 	inline static bool storageScancfg;
+    inline static bool crystalSpamcfg;
+    inline static bool nightFxcfg;
 };
 
 static std::string getMinecraftFolder() {
@@ -235,5 +245,117 @@ static void RenderCustomShaders() {
         int b = 200 + rand() % 55;
         bg->AddCircleFilled(ImVec2(rx, ry), 1.5f,
             IM_COL32(r, g, b, (int)((80 * flicker) * alphaMultiplier)));
+    }
+}
+
+
+static void CosmicCrosshair() {
+    float time = static_cast<float>(ImGui::GetTime());
+    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+    ImVec2 size = ImGui::GetIO().DisplaySize;
+    ImVec2 center = ImVec2(size.x / 2.0f, size.y / 2.0f);
+
+    // === Cosmic Portal/Galaxy Crosshair ===
+    // We'll use the portal code but position it at screen center
+    float portal_phase = 1.0f; // Fully active (no fade in/out)
+    float radius = cfg::nightFxSize;//20.0f;
+    float rotation = time * 1.2f; // Rotation speed
+
+    // Draw portal rings
+    for (int ring = 0; ring < 5; ring++) {
+        float ring_radius = radius * (0.4f + ring * 0.15f);
+        float ring_alpha = 0.8f - ring * 0.15f; // Make rings more visible for crosshair purpose
+
+        // Pulse effect for rings
+        float ring_pulse = 0.7f + 0.3f * sinf(time * 3.0f + ring);
+
+        // Blend between green and purple for cosmic effect
+        float hue = 0.28f + 0.3f * (sinf(time + ring * 0.5f) * 0.5f + 0.5f);
+        float r, g, b;
+        ImGui::ColorConvertHSVtoRGB(hue, 0.9f, 1.0f, r, g, b);
+
+        // Number of segments in each ring for a more complex portal
+        const int segments = 36;
+        for (int i = 0; i < segments; i++) {
+            float angle1 = rotation + 2.0f * IM_PI * i / segments;
+            float angle2 = rotation + 2.0f * IM_PI * (i + 1) / segments;
+
+            // Wave effect in rings
+            float wave = 1.0f + 0.15f * sinf(angle1 * 6.0f + time * 4.0f);
+
+            ImVec2 p1(
+                center.x + cosf(angle1) * ring_radius * wave,
+                center.y + sinf(angle1) * ring_radius * wave
+            );
+            ImVec2 p2(
+                center.x + cosf(angle2) * ring_radius * wave,
+                center.y + sinf(angle2) * ring_radius * wave
+            );
+
+            // Draw segment
+            ImU32 segment_color = IM_COL32(
+                (int)(r * 255),
+                (int)(g * 255),
+                (int)(b * 255),
+                (int)(180 * ring_alpha * ring_pulse)
+            );
+            drawList->AddLine(p1, p2, segment_color, 1.0f);
+        }
+    }
+
+    // Draw energy rays from portal for crosshair effect
+    const int rays = 8;
+    for (int i = 0; i < rays; i++) {
+        float ray_angle = rotation * 0.5f + 2.0f * IM_PI * i / rays;
+        float ray_length = radius * 1.5f * (0.5f + 0.5f * sinf(time * 2.0f + i));
+
+        ImVec2 ray_end(
+            center.x + cosf(ray_angle) * ray_length,
+            center.y + sinf(ray_angle) * ray_length
+        );
+
+        // Ray color with pulsating effect
+        float ray_hue = 0.3f + 0.1f * sinf(time * 2.0f + i);
+        float r, g, b;
+        ImGui::ColorConvertHSVtoRGB(ray_hue, 0.9f, 1.0f, r, g, b);
+
+        float ray_alpha = 0.7f + 0.3f * sinf(time * 5.0f + i);
+        ImU32 ray_color = IM_COL32(
+            (int)(r * 255),
+            (int)(g * 255),
+            (int)(b * 255),
+            (int)(180 * ray_alpha)
+        );
+
+        drawList->AddLine(center, ray_end, ray_color, 1.0f);
+    }
+
+    // Portal center glow - this is the center of the crosshair
+    drawList->AddCircleFilled(center, radius * 0.3f,
+        IM_COL32(120, 255, 180, 120));
+    drawList->AddCircleFilled(center, radius * 0.15f,
+        IM_COL32(220, 255, 220, 180));
+
+    // Optional: Add cardinal crosshair lines for better targeting
+    // These lines help with precise aiming while keeping the cosmic effect
+    if (cfg::nightFxCrosshairLines) {
+        const float crossLength = radius * 0.7f;
+        ImU32 crossColor = IM_COL32(255, 255, 255, 150);
+
+        // Horizontal line (pulsing)
+        float horizontalPulse = 0.8f + 0.2f * sinf(time * 4.0f);
+        drawList->AddLine(
+            ImVec2(center.x - crossLength * horizontalPulse, center.y),
+            ImVec2(center.x + crossLength * horizontalPulse, center.y),
+            crossColor, 1.0f
+        );
+
+        // Vertical line (pulsing slightly out of phase)
+        float verticalPulse = 0.8f + 0.2f * sinf(time * 4.0f + 0.5f);
+        drawList->AddLine(
+            ImVec2(center.x, center.y - crossLength * verticalPulse),
+            ImVec2(center.x, center.y + crossLength * verticalPulse),
+            crossColor, 1.0f
+        );
     }
 }
