@@ -34,6 +34,15 @@ struct EspBlock {
     }
 };
 
+struct PlayerInfo {
+    std::string name;
+    float distance;
+    std::array<std::string, 4> armor; // helmet, chest, legs, boots
+    std::string mainhand;
+    std::string offhand;
+};
+
+
 
 // Configuration class with inline static members
 class cfg {
@@ -58,7 +67,7 @@ public:
     inline static std::string isPlayerAirSafe;
     inline static bool isPlayerAirSafeShowStatus;
     inline static bool forwardTunnel;
-    inline static std::vector<std::string> nearbyPlayers;
+    inline static std::vector<PlayerInfo> nearbyPlayers;
     inline static std::string tunnelBlockStatus;
     inline static bool autoCrystal;
     inline static int crystalAttackTime = 96;

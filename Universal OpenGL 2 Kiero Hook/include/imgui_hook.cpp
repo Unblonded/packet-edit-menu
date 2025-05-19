@@ -47,120 +47,154 @@ void SetCyberpunkNeonTheme()
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
 
-	// Base styling with sharp corners and tight spacing
-	style.WindowPadding = ImVec2(15, 15);
-	style.FramePadding = ImVec2(10, 6);
-	style.ItemSpacing = ImVec2(10, 8);
-	style.ItemInnerSpacing = ImVec2(6, 6);
+	// ULTRA FUTURISTIC SPACING - Making everything feel premium
+	style.WindowPadding = ImVec2(20, 20);
+	style.FramePadding = ImVec2(14, 8);
+	style.ItemSpacing = ImVec2(14, 10);
+	style.ItemInnerSpacing = ImVec2(8, 8);
 	style.TouchExtraPadding = ImVec2(0, 0);
-	style.IndentSpacing = 20.0f;
-	style.ScrollbarSize = 12.0f;
-	style.GrabMinSize = 10.0f;
+	style.IndentSpacing = 25.0f;
+	style.ScrollbarSize = 16.0f;
+	style.GrabMinSize = 14.0f;
+	style.TabMinWidthForCloseButton = 0.0f;
 
-	// Sharp corners for that cyberpunk edge
-	style.WindowRounding = 4.0f;
-	style.ChildRounding = 4.0f;
-	style.FrameRounding = 4.0f;
-	style.PopupRounding = 4.0f;
-	style.ScrollbarRounding = 4.0f;
+	// SURGICAL PRECISION ROUNDING - Perfect balance between sharp and smooth
+	style.WindowRounding = 8.0f;
+	style.ChildRounding = 6.0f;
+	style.FrameRounding = 6.0f;
+	style.PopupRounding = 8.0f;
+	style.ScrollbarRounding = 12.0f;
 	style.GrabRounding = 4.0f;
-	style.TabRounding = 4.0f;
+	style.TabRounding = 6.0f;
+	style.WindowTitleAlign = ImVec2(0.50f, 0.50f);
 
-	// Cyberpunk color palette - NEON INTENSITY with MORE TRANSPARENCY
-	const ImVec4 bg_dark = ImVec4(0.03f, 0.03f, 0.06f, 0.85f);     // Deep purple-black with transparency
-	const ImVec4 bg_medium = ImVec4(0.08f, 0.05f, 0.12f, 0.82f);   // Dark purple with transparency
-	const ImVec4 bg_light = ImVec4(0.12f, 0.08f, 0.18f, 0.80f);    // Medium purple with transparency
+	// BORDER STYLING - Glow effect simulation
+	style.WindowBorderSize = 1.0f;
+	style.ChildBorderSize = 1.0f;
+	style.PopupBorderSize = 1.0f;
+	style.FrameBorderSize = 1.0f;
+	style.TabBorderSize = 1.0f;
 
-	// Neon accent colors with transparency
-	const ImVec4 neon_pink = ImVec4(1.00f, 0.08f, 0.58f, 0.85f);    // Hot pink
-	const ImVec4 neon_blue = ImVec4(0.08f, 0.85f, 1.00f, 0.85f);    // Electric blue
-	const ImVec4 neon_purple = ImVec4(0.70f, 0.30f, 1.00f, 0.85f);  // Purple haze
-	const ImVec4 neon_green = ImVec4(0.30f, 1.00f, 0.40f, 0.85f);   // Matrix green
+	// ULTRA ENHANCED COLOR PALETTE - Each color scientifically crafted for maximum impact
 
-	// Solid versions of neon colors for text and important elements
-	const ImVec4 solid_pink = ImVec4(1.00f, 0.08f, 0.58f, 1.00f);
-	const ImVec4 solid_blue = ImVec4(0.08f, 0.85f, 1.00f, 1.00f);
-	const ImVec4 solid_purple = ImVec4(0.70f, 0.30f, 1.00f, 1.00f);
-	const ImVec4 solid_green = ImVec4(0.30f, 1.00f, 0.40f, 1.00f);
+	// BASE LAYERS - Deep space darkness with subtle energy
+	const ImVec4 void_black = ImVec4(0.02f, 0.02f, 0.08f, 0.95f);      // The abyss itself
+	const ImVec4 shadow_purple = ImVec4(0.06f, 0.03f, 0.15f, 0.90f);   // Dark matter
+	const ImVec4 deep_violet = ImVec4(0.10f, 0.06f, 0.20f, 0.85f);     // Quantum foam
+	const ImVec4 medium_purple = ImVec4(0.15f, 0.10f, 0.25f, 0.80f);   // Digital mist
 
-	const ImVec4 text_primary = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);   // Bright white
-	const ImVec4 text_secondary = ImVec4(0.70f, 0.71f, 0.75f, 0.85f); // Grayish with transparency
-	const ImVec4 border_color = ImVec4(0.40f, 0.20f, 0.60f, 0.40f);   // Purple border with more transparency
+	// NEON ARSENAL - Pure energy in color form
+	const ImVec4 plasma_pink = ImVec4(1.00f, 0.05f, 0.65f, 0.90f);     // Hot plasma
+	const ImVec4 electric_cyan = ImVec4(0.00f, 0.90f, 1.00f, 0.90f);   // Lightning essence
+	const ImVec4 void_purple = ImVec4(0.75f, 0.25f, 1.00f, 0.90f);     // Psychic energy
+	const ImVec4 matrix_green = ImVec4(0.25f, 1.00f, 0.35f, 0.90f);    // Code rain
+	const ImVec4 solar_orange = ImVec4(1.00f, 0.45f, 0.00f, 0.90f);    // Digital fire
+	const ImVec4 neural_blue = ImVec4(0.15f, 0.70f, 1.00f, 0.90f);     // Brain waves
 
-	// Main colors
-	colors[ImGuiCol_Text] = text_primary;
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 0.65f);
-	colors[ImGuiCol_WindowBg] = bg_dark;
-	colors[ImGuiCol_ChildBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.70f); // More transparent
-	colors[ImGuiCol_PopupBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.85f);
-	colors[ImGuiCol_Border] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.35f); // Subtle border
-	colors[ImGuiCol_BorderShadow] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.15f);
+	// SOLID VARIANTS - For maximum visibility when needed
+	const ImVec4 solid_plasma = ImVec4(1.00f, 0.05f, 0.65f, 1.00f);
+	const ImVec4 solid_cyan = ImVec4(0.00f, 0.90f, 1.00f, 1.00f);
+	const ImVec4 solid_purple = ImVec4(0.75f, 0.25f, 1.00f, 1.00f);
+	const ImVec4 solid_green = ImVec4(0.25f, 1.00f, 0.35f, 1.00f);
 
-	// Frame background - more transparent
-	colors[ImGuiCol_FrameBg] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.60f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(neon_purple.x * 0.4f, neon_purple.y * 0.4f, neon_purple.z * 0.4f, 0.35f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(neon_purple.x * 0.5f, neon_purple.y * 0.5f, neon_purple.z * 0.5f, 0.50f);
+	// TEXT HIERARCHY - Crystal clear communication
+	const ImVec4 hologram_white = ImVec4(0.98f, 0.98f, 1.00f, 1.00f);     // Pure information
+	const ImVec4 ghost_gray = ImVec4(0.75f, 0.78f, 0.85f, 0.90f);         // Secondary data
+	const ImVec4 whisper_gray = ImVec4(0.55f, 0.58f, 0.65f, 0.70f);       // Disabled state
 
-	// Title bars - semi-transparent
-	colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.05f, 0.12f, 0.80f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(neon_purple.x * 0.25f, neon_purple.y * 0.25f, neon_purple.z * 0.25f, 0.85f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.05f, 0.12f, 0.50f);
+	// GLOW EFFECTS - Simulated with alpha layering
+	const ImVec4 glow_pink = ImVec4(1.00f, 0.05f, 0.65f, 0.25f);
+	const ImVec4 glow_cyan = ImVec4(0.00f, 0.90f, 1.00f, 0.25f);
+	const ImVec4 glow_purple = ImVec4(0.75f, 0.25f, 1.00f, 0.25f);
 
-	// Buttons - ALTERNATING NEON COLORS with transparency
-	colors[ImGuiCol_Button] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(neon_pink.x + 0.2f, neon_pink.y + 0.2f, neon_pink.z + 0.2f, 0.70f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(neon_pink.x - 0.1f, neon_pink.y - 0.1f, neon_pink.z - 0.1f, 0.80f);
+	// FOUNDATION - The canvas of cyberspace
+	colors[ImGuiCol_Text] = hologram_white;
+	colors[ImGuiCol_TextDisabled] = whisper_gray;
+	colors[ImGuiCol_WindowBg] = void_black;
+	colors[ImGuiCol_ChildBg] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.60f);
+	colors[ImGuiCol_PopupBg] = ImVec4(deep_violet.x, deep_violet.y, deep_violet.z, 0.95f);
 
-	// Headers - more transparent
-	colors[ImGuiCol_Header] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.55f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(neon_blue.x + 0.2f, neon_blue.y + 0.2f, neon_blue.z + 0.2f, 0.65f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(neon_blue.x - 0.1f, neon_blue.y - 0.1f, neon_blue.z - 0.1f, 0.75f);
+	// BORDERS - The electric edges of reality
+	colors[ImGuiCol_Border] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.55f);
+	colors[ImGuiCol_BorderShadow] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.10f);
 
-	// Scrollbars - more transparent
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.40f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.60f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(neon_purple.x + 0.2f, neon_purple.y + 0.2f, neon_purple.z + 0.2f, 0.70f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(neon_purple.x - 0.1f, neon_purple.y - 0.1f, neon_purple.z - 0.1f, 0.80f);
+	// INTERACTIVE SURFACES - Where user meets machine
+	colors[ImGuiCol_FrameBg] = ImVec4(deep_violet.x, deep_violet.y, deep_violet.z, 0.65f);
+	colors[ImGuiCol_FrameBgHovered] = ImVec4(void_purple.x * 0.6f, void_purple.y * 0.6f, void_purple.z * 0.6f, 0.45f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(void_purple.x * 0.8f, void_purple.y * 0.8f, void_purple.z * 0.8f, 0.65f);
 
-	// Checkbox, RadioButton, etc. - keeping solid for visibility
+	// TITLE BARS - Command center aesthetics
+	colors[ImGuiCol_TitleBg] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.85f);
+	colors[ImGuiCol_TitleBgActive] = ImVec4(void_purple.x * 0.4f, void_purple.y * 0.4f, void_purple.z * 0.4f, 0.90f);
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.45f);
+
+	// BUTTONS - The keys to digital power
+	colors[ImGuiCol_Button] = ImVec4(plasma_pink.x * 0.7f, plasma_pink.y * 0.7f, plasma_pink.z * 0.7f, 0.70f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.85f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(plasma_pink.x + 0.15f, plasma_pink.y + 0.15f, plasma_pink.z + 0.15f, 0.95f);
+
+	// HEADERS - Information superhighway
+	colors[ImGuiCol_Header] = ImVec4(electric_cyan.x * 0.6f, electric_cyan.y * 0.6f, electric_cyan.z * 0.6f, 0.65f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.80f);
+	colors[ImGuiCol_HeaderActive] = ImVec4(electric_cyan.x + 0.1f, electric_cyan.y + 0.1f, electric_cyan.z + 0.1f, 0.90f);
+
+	// SEPARATOR LINES - The grid of cyberspace
+	colors[ImGuiCol_Separator] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.60f);
+	colors[ImGuiCol_SeparatorHovered] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.80f);
+	colors[ImGuiCol_SeparatorActive] = ImVec4(matrix_green.x, matrix_green.y, matrix_green.z, 0.90f);
+
+	// SCROLLBARS - Navigating the data stream
+	colors[ImGuiCol_ScrollbarBg] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.40f);
+	colors[ImGuiCol_ScrollbarGrab] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.70f);
+	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(void_purple.x + 0.15f, void_purple.y + 0.15f, void_purple.z + 0.15f, 0.85f);
+	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.95f);
+
+	// CONTROL ELEMENTS - Precision instruments
 	colors[ImGuiCol_CheckMark] = solid_green;
-	colors[ImGuiCol_SliderGrab] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.75f);
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.85f);
+	colors[ImGuiCol_SliderGrab] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.85f);
+	colors[ImGuiCol_SliderGrabActive] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.95f);
 
-	// Text input - more subtle selection
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.25f);
+	// TEXT SELECTION - Highlighting the important bits
+	colors[ImGuiCol_TextSelectedBg] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.35f);
 
-	// Tabs - with transparency gradient
-	colors[ImGuiCol_Tab] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.65f);
-	colors[ImGuiCol_TabHovered] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.70f);
-	colors[ImGuiCol_TabActive] = ImVec4(neon_purple.x * 0.8f, neon_purple.y * 0.8f, neon_purple.z * 0.8f, 0.75f);
-	colors[ImGuiCol_TabUnfocused] = ImVec4(bg_medium.x, bg_medium.y, bg_medium.z, 0.55f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(bg_light.x, bg_light.y, bg_light.z, 0.65f);
+	// DRAG AND DROP - Moving data through space
+	colors[ImGuiCol_DragDropTarget] = ImVec4(matrix_green.x, matrix_green.y, matrix_green.z, 0.80f);
 
-	// Separators - GLOWING EDGES with transparency
-	colors[ImGuiCol_Separator] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.50f);
-	colors[ImGuiCol_SeparatorHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
-	colors[ImGuiCol_SeparatorActive] = ImVec4(neon_green.x, neon_green.y, neon_green.z, 0.70f);
+	// NAVIGATION - Moving through digital space
+	colors[ImGuiCol_NavHighlight] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.85f);
+	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.75f);
+	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.10f, 0.10f, 0.15f, 0.60f);
 
-	// Resize grip - with transparency
-	colors[ImGuiCol_ResizeGrip] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.40f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.60f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.80f);
+	// MODAL OVERLAYS - The focus field
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.05f, 0.05f, 0.10f, 0.70f);
 
-	// Plot lines - keeping more visible
-	colors[ImGuiCol_PlotLines] = ImVec4(neon_green.x, neon_green.y, neon_green.z, 0.80f);
-	colors[ImGuiCol_PlotLinesHovered] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.90f);
-	colors[ImGuiCol_PlotHistogram] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.80f);
-	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(neon_purple.x, neon_purple.y, neon_purple.z, 0.90f);
+	// TAB SYSTEM - Multitasking in the matrix
+	colors[ImGuiCol_Tab] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.70f);
+	colors[ImGuiCol_TabHovered] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.85f);
+	colors[ImGuiCol_TabActive] = ImVec4(void_purple.x * 0.9f, void_purple.y * 0.9f, void_purple.z * 0.9f, 0.90f);
+	colors[ImGuiCol_TabUnfocused] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.50f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(deep_violet.x, deep_violet.y, deep_violet.z, 0.70f);
 
-	// Navigation - slightly transparent
-	colors[ImGuiCol_NavHighlight] = ImVec4(neon_pink.x, neon_pink.y, neon_pink.z, 0.80f);
-	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(neon_blue.x, neon_blue.y, neon_blue.z, 0.70f);
-	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.60f);
+	// RESIZE CONTROLS - Shaping reality
+	colors[ImGuiCol_ResizeGrip] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.45f);
+	colors[ImGuiCol_ResizeGripHovered] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.70f);
+	colors[ImGuiCol_ResizeGripActive] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.90f);
 
-	// For extra glow effect
-	style.Alpha = 0.95f; // Global transparency
+	// DATA VISUALIZATION - Making numbers beautiful
+	colors[ImGuiCol_PlotLines] = ImVec4(matrix_green.x, matrix_green.y, matrix_green.z, 0.85f);
+	colors[ImGuiCol_PlotLinesHovered] = ImVec4(plasma_pink.x, plasma_pink.y, plasma_pink.z, 0.95f);
+	colors[ImGuiCol_PlotHistogram] = ImVec4(electric_cyan.x, electric_cyan.y, electric_cyan.z, 0.85f);
+	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.95f);
+
+	// TABLE SYSTEM - Organized data streams
+	colors[ImGuiCol_TableHeaderBg] = ImVec4(deep_violet.x, deep_violet.y, deep_violet.z, 0.80f);
+	colors[ImGuiCol_TableBorderStrong] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.70f);
+	colors[ImGuiCol_TableBorderLight] = ImVec4(void_purple.x, void_purple.y, void_purple.z, 0.35f);
+	colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	colors[ImGuiCol_TableRowBgAlt] = ImVec4(shadow_purple.x, shadow_purple.y, shadow_purple.z, 0.25f);
+
+	// FINAL TOUCHES - The polish that makes it shine
+	style.Alpha = 0.95f;  // Overall transparency for that holographic feel
 }
 
 

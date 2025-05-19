@@ -11,9 +11,6 @@
 #include <filesystem>
 #include "cfg.h"
 #include "IconsFontAwesome5.h"
-#include "include/imgui/imgui_impl_opengl2.h"
-#include "include/imgui/imgui_impl_win32.h"
-#include "include/kiero/kiero.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -374,11 +371,42 @@ void RenderMain()
 
     if (cfg::displayPlayers) {
         ImGui::Begin("Nearby Players");
-        for (const auto& name : cfg::nearbyPlayers) {
-            ImGui::TextUnformatted(name.c_str());
+
+        for (const auto& entry : cfg::nearbyPlayers) {
+            const std::string& name = entry.name;
+            float distance = entry.distance;
+            const auto& armor = entry.armor;         // std::array<std::string, 4>
+            const auto& mainhand = entry.mainhand;   // std::string
+            const auto& offhand = entry.offhand;     // std::string
+
+            // Use stable ID: just player name
+            // Use label with distance shown as visible text
+            std::string treeID = name + "##" + name; // stable unique ID
+            std::string headerLabel = name + " - " + std::format("{:.1f}m", distance); // visible label
+
+            if (ImGui::TreeNode(treeID.c_str(), "%s", headerLabel.c_str())) {
+
+                if (ImGui::TreeNode("Armor")) {
+                    ImGui::Text("Helm " ICON_FA_CHEVRON_RIGHT" %s", armor[0].c_str());
+                    ImGui::Text("Chest " ICON_FA_CHEVRON_RIGHT" %s", armor[1].c_str());
+                    ImGui::Text("Leg " ICON_FA_CHEVRON_RIGHT" %s", armor[2].c_str());
+                    ImGui::Text("Boot " ICON_FA_CHEVRON_RIGHT" %s", armor[3].c_str());
+                    ImGui::TreePop();
+                }
+
+                if (ImGui::TreeNode("Hands")) {
+                    ImGui::Text("Main " ICON_FA_CHEVRON_RIGHT " %s", mainhand.c_str());
+                    ImGui::Text("Off " ICON_FA_CHEVRON_RIGHT " %s", offhand.c_str());
+                    ImGui::TreePop();
+                }
+
+                ImGui::TreePop(); // Player section
+            }
         }
+
         ImGui::End();
     }
+
 
     if (cfg::checkPlayerAirSafety && cfg::isPlayerAirSafeShowStatus) {
 		ImGui::Begin("Dig Safety");
@@ -569,9 +597,46 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     // Player list
                     if (data.contains("PLAYERS") && data["PLAYERS"].is_array()) {
                         cfg::nearbyPlayers.clear();
-                        for (const auto& name : data["PLAYERS"]) {
-                            if (name.is_string())
-                                cfg::nearbyPlayers.push_back(name.get<std::string>());
+
+                        for (const auto& playerJson : data["PLAYERS"]) {
+                            if (!playerJson.is_object()) continue;
+
+                            PlayerInfo pInfo;
+
+                            if (playerJson.contains("name") && playerJson["name"].is_string())
+                                pInfo.name = playerJson["name"].get<std::string>();
+
+                            if (playerJson.contains("distance") && playerJson["distance"].is_number_float())
+                                pInfo.distance = playerJson["distance"].get<float>();
+
+                            if (playerJson.contains("armor") && playerJson["armor"].is_array()) {
+                                int idx = 0;
+                                for (const auto& armorPiece : playerJson["armor"]) {
+                                    if (idx >= 4) break; // Just 4 armor pieces expected
+                                    if (armorPiece.is_string())
+                                        pInfo.armor[idx++] = armorPiece.get<std::string>();
+                                }
+                                // If less than 4, remaining stay empty strings
+                                for (; idx < 4; idx++) {
+                                    pInfo.armor[idx] = "";
+                                }
+                            }
+                            else {
+                                // default empty armor
+                                pInfo.armor.fill("");
+                            }
+
+                            if (playerJson.contains("mainhand") && playerJson["mainhand"].is_string())
+                                pInfo.mainhand = playerJson["mainhand"].get<std::string>();
+                            else
+                                pInfo.mainhand = "";
+
+                            if (playerJson.contains("offhand") && playerJson["offhand"].is_string())
+                                pInfo.offhand = playerJson["offhand"].get<std::string>();
+                            else
+                                pInfo.offhand = "";
+
+                            cfg::nearbyPlayers.push_back(std::move(pInfo));
                         }
                     }
                 }
@@ -593,7 +658,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 			}
         }
 
-        Sleep(1);
+        Sleep(5);
     }
 
     closesocket(clientSock);
