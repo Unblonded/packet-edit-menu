@@ -72,6 +72,7 @@ public:
     inline static bool isPlayerAirSafeShowStatus;
     inline static bool forwardTunnel;
     inline static std::vector<PlayerInfo> nearbyPlayers;
+    inline static bool freezePlayers;
     inline static std::string tunnelBlockStatus;
     inline static bool autoCrystal;
     inline static int crystalAttackTime = 96;

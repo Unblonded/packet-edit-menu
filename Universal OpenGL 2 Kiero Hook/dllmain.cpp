@@ -25,12 +25,6 @@ bool singleInit = false;
 void RenderMain()
 {
     if (!cfg::showAll) return;
-    if (!cfg::showMenu && !cfg::storageScanShowInGui) cfg::showMenuInitialized = false;
-
-	if (!cfg::showMenuInitialized) {
-        ImGui::SetWindowFocus(nullptr);
-        cfg::showMenuInitialized = true;
-    }
 
     static float pulse_speed = 3.5f;
     float pulse = 0.5f + 0.5f * sinf(static_cast<float>(ImGui::GetTime()) * pulse_speed);
@@ -372,53 +366,56 @@ void RenderMain()
     if (cfg::displayPlayers) {
         ImGui::Begin("Nearby Players");
 
-        for (const auto& entry : cfg::nearbyPlayers) {
+        // Top-level freeze toggle
+        ImGui::Checkbox(ICON_FA_SNOWFLAKE " Freeze List", &cfg::freezePlayers);
+        if (cfg::freezePlayers) {
+            ImGui::TextColored(ImVec4(0.8f, 0.5f, 0.2f, 1.0f), "List is frozen.");
+        }
+        ImGui::Separator();
+
+        for (const PlayerInfo& entry : cfg::nearbyPlayers) {
             const std::string& name = entry.name;
             float distance = entry.distance;
-            const auto& armor = entry.armor;         // std::array<std::string, 4>
-            const auto& mainhand = entry.mainhand;   // std::string
-            const auto& offhand = entry.offhand;     // std::string
-            const auto& health = entry.health;
-            const auto& armorTuffness = entry.armorTuffness;
-            const auto& isSneaking = entry.isSneaking;
-            const auto& isSprinting = entry.isSprinting;
+            const std::array<std::string, 4>& armor = entry.armor;
+            const std::string& mainhand = entry.mainhand;
+            const std::string& offhand = entry.offhand;
+            float health = entry.health;
+            int armorTuffness = entry.armorTuffness;
+            bool isSneaking = entry.isSneaking;
+            bool isSprinting = entry.isSprinting;
 
-            // Use stable ID: just player name
-            // Use label with distance shown as visible text
-            std::string treeID = name + "##" + name; // stable unique ID
-            std::string headerLabel = name + " - " + std::format("{:.1f}m", distance); // visible label
+            std::string treeID = name + "##" + name;
+            std::string headerLabel = name + " - " + std::format("{:.1f}m", distance);
 
             if (ImGui::TreeNode(treeID.c_str(), "%s", headerLabel.c_str())) {
-
                 if (ImGui::TreeNode("Stats")) {
-                    ImGui::Text("Health " "->" " %.1f", health);
-                    ImGui::Text("Armor Rating " "->" " %i", armorTuffness);
-                    ImGui::Text("Sprinting" "->" " %s", isSprinting ? "yes" : "no");
-                    ImGui::Text("Sneaking" "->" " %s", isSneaking ? "yes" : "no");
-
+                    ImGui::Text("Health -> %.1f", health);
+                    ImGui::Text("Armor Rating -> %d", armorTuffness);
+                    ImGui::Text("Sprinting -> %s", isSprinting ? "yes" : "no");
+                    ImGui::Text("Sneaking -> %s", isSneaking ? "yes" : "no");
                     ImGui::TreePop();
                 }
-            	if (ImGui::TreeNode("Armor")) {
-                    ImGui::Text("Helm " "->"" %s", armor[0].c_str());
-                    ImGui::Text("Chest " "->"" %s", armor[1].c_str());
-                    ImGui::Text("Leg " "->"" %s", armor[2].c_str());
-                    ImGui::Text("Boot " "->"" %s", armor[3].c_str());
+
+                if (ImGui::TreeNode("Armor")) {
+                    ImGui::Text("Helm -> %s", armor[0].c_str());
+                    ImGui::Text("Chest -> %s", armor[1].c_str());
+                    ImGui::Text("Leg -> %s", armor[2].c_str());
+                    ImGui::Text("Boot -> %s", armor[3].c_str());
                     ImGui::TreePop();
                 }
 
                 if (ImGui::TreeNode("Hands")) {
-                    ImGui::Text("Main " "->" " %s", mainhand.c_str());
-                    ImGui::Text("Off " "->" " %s", offhand.c_str());
+                    ImGui::Text("Main -> %s", mainhand.c_str());
+                    ImGui::Text("Off -> %s", offhand.c_str());
                     ImGui::TreePop();
                 }
 
-                ImGui::TreePop(); // Player section
+                ImGui::TreePop();
             }
         }
 
         ImGui::End();
     }
-
 
     if (cfg::checkPlayerAirSafety && cfg::isPlayerAirSafeShowStatus) {
 		ImGui::Begin("Dig Safety");
@@ -583,7 +580,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     ptr += sent;
                 }
             }
-            else if (message.find("STATUS") != std::string::npos) {
+            else if (message.find("STATUS") != std::string::npos && !cfg::freezePlayers) {
                 try {
                     size_t jsonStart = message.find_first_of('{');
 
