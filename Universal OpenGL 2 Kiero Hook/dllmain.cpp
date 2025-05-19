@@ -378,6 +378,10 @@ void RenderMain()
             const auto& armor = entry.armor;         // std::array<std::string, 4>
             const auto& mainhand = entry.mainhand;   // std::string
             const auto& offhand = entry.offhand;     // std::string
+            const auto& health = entry.health;
+            const auto& armorTuffness = entry.armorTuffness;
+            const auto& isSneaking = entry.isSneaking;
+            const auto& isSprinting = entry.isSprinting;
 
             // Use stable ID: just player name
             // Use label with distance shown as visible text
@@ -386,17 +390,25 @@ void RenderMain()
 
             if (ImGui::TreeNode(treeID.c_str(), "%s", headerLabel.c_str())) {
 
-                if (ImGui::TreeNode("Armor")) {
-                    ImGui::Text("Helm " ICON_FA_CHEVRON_RIGHT" %s", armor[0].c_str());
-                    ImGui::Text("Chest " ICON_FA_CHEVRON_RIGHT" %s", armor[1].c_str());
-                    ImGui::Text("Leg " ICON_FA_CHEVRON_RIGHT" %s", armor[2].c_str());
-                    ImGui::Text("Boot " ICON_FA_CHEVRON_RIGHT" %s", armor[3].c_str());
+                if (ImGui::TreeNode("Stats")) {
+                    ImGui::Text("Health " "->" " %.1f", health);
+                    ImGui::Text("Armor Rating " "->" " %i", armorTuffness);
+                    ImGui::Text("Sprinting" "->" " %s", isSprinting ? "yes" : "no");
+                    ImGui::Text("Sneaking" "->" " %s", isSneaking ? "yes" : "no");
+
+                    ImGui::TreePop();
+                }
+            	if (ImGui::TreeNode("Armor")) {
+                    ImGui::Text("Helm " "->"" %s", armor[0].c_str());
+                    ImGui::Text("Chest " "->"" %s", armor[1].c_str());
+                    ImGui::Text("Leg " "->"" %s", armor[2].c_str());
+                    ImGui::Text("Boot " "->"" %s", armor[3].c_str());
                     ImGui::TreePop();
                 }
 
                 if (ImGui::TreeNode("Hands")) {
-                    ImGui::Text("Main " ICON_FA_CHEVRON_RIGHT " %s", mainhand.c_str());
-                    ImGui::Text("Off " ICON_FA_CHEVRON_RIGHT " %s", offhand.c_str());
+                    ImGui::Text("Main " "->" " %s", mainhand.c_str());
+                    ImGui::Text("Off " "->" " %s", offhand.c_str());
                     ImGui::TreePop();
                 }
 
@@ -628,13 +640,30 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 
                             if (playerJson.contains("mainhand") && playerJson["mainhand"].is_string())
                                 pInfo.mainhand = playerJson["mainhand"].get<std::string>();
-                            else
-                                pInfo.mainhand = "";
+                            else pInfo.mainhand = "";
 
                             if (playerJson.contains("offhand") && playerJson["offhand"].is_string())
                                 pInfo.offhand = playerJson["offhand"].get<std::string>();
-                            else
-                                pInfo.offhand = "";
+                            else pInfo.offhand = "";
+
+
+                            if (playerJson.contains("health") && playerJson["health"].is_number_float())
+                                pInfo.health = playerJson["health"].get<float>();
+                            else pInfo.health = 0.f;
+
+                            if (playerJson.contains("armorTuffness") && playerJson["armorTuffness"].is_number_integer())
+                                pInfo.armorTuffness = playerJson["armorTuffness"].get<int>();
+                            else pInfo.armorTuffness = 0;
+
+                            if (playerJson.contains("isSneaking") && playerJson["isSneaking"].is_boolean())
+                                pInfo.isSneaking = playerJson["isSneaking"].get<bool>();
+                            else pInfo.isSneaking = false;
+
+                            if (playerJson.contains("isSprinting") && playerJson["isSprinting"].is_boolean())
+                                pInfo.isSprinting = playerJson["isSprinting"].get<bool>();
+                            else pInfo.isSprinting = false;
+
+
 
                             cfg::nearbyPlayers.push_back(std::move(pInfo));
                         }

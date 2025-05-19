@@ -40,6 +40,10 @@ struct PlayerInfo {
     std::array<std::string, 4> armor; // helmet, chest, legs, boots
     std::string mainhand;
     std::string offhand;
+    float health;
+    int armorTuffness;
+    bool isSneaking;
+    bool isSprinting;
 };
 
 
