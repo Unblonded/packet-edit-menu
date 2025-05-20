@@ -339,7 +339,7 @@ void RenderMain()
                 ImGui::ColorEdit4("##color", (float*)&cfg::espBlockList[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
                 ImGui::SameLine();
                 ImGui::TextUnformatted(cfg::espBlockList[i].name.c_str());
-                ImGui::SameLine(ImGui::GetWindowWidth() - 110);
+                ImGui::SameLine(ImGui::GetWindowWidth() - 120);
                 if (ImGui::SmallButton("Remove")) {
                     cfg::espBlockList.erase(cfg::espBlockList.begin() + i);
                     --i;
