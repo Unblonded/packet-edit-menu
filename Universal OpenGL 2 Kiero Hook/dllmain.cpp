@@ -85,6 +85,10 @@ void RenderMain()
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_GEARS "##crystalspam")) cfg::crystalSpamcfg = !cfg::crystalSpamcfg;
 
+				ImGui::Checkbox(ICON_FA_BOMB " Self Crystal", &cfg::selfCrystal);
+				ImGui::SameLine();
+				if (ImGui::Button(ICON_FA_GEARS "##selfcrystal")) cfg::selfCrystalcfg = !cfg::selfCrystalcfg;
+
                 ImGui::EndTabItem();
             }
 
@@ -159,6 +163,15 @@ void RenderMain()
         ImGui::End();
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
+
+        if (cfg::selfCrystalcfg) {
+			ImGui::Begin("Self Crystal", &cfg::selfCrystalcfg);
+			ImGui::Text("Self Crystal is %s", cfg::selfCrystal ? "enabled" : "disabled");
+			ImGui::SliderInt("Delay (ms)", &cfg::selfCrystalDelay, 1.0f, 300.f);
+			ImGui::SliderInt("Humanity (ms)", &cfg::selfCrystalHumanity, 1.0f, 100.f);
+			ImGui::End();
+	        
+        }
 
         if (cfg::autoAnchorcfg) {
             ImGui::Begin("Auto Anchor", &cfg::autoAnchorcfg);
@@ -567,6 +580,9 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["crystalSpamSearchRadius"] = cfg::crystalSpamSearchRadius;
 				config["crystalSpamBreakDelay"] = cfg::crystalSpamBreakDelay;
 				config["nightFx"] = cfg::nightFx;
+				config["selfCrystal"] = cfg::selfCrystal;
+				config["selfCrystalDelay"] = cfg::selfCrystalDelay;
+				config["selfCrystalHumanity"] = cfg::selfCrystalHumanity;
 
                 cfg::triggerAutoSell = false;
                 json espBlocksJson = json::array();
@@ -592,31 +608,21 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     ptr += sent;
                 }
             }
-            else if (message.find("STATUS") != std::string::npos && !cfg::freezePlayers) {
+            else if (message.find("STATUS") != std::string::npos) {
                 try {
                     size_t jsonStart = message.find_first_of('{');
 
                     std::string jsonStr = message.substr(jsonStart);
                     json data = json::parse(jsonStr);
 
-                    // Render flags
                     cfg::showMenu = data.value("shouldRender", false);
                     cfg::showAll = data.value("worldReady", false);
-
-                    // Player safety
                     cfg::isPlayerAirSafe = data.value("playerAirSafety", "");
-
-                    // Tunnel block status
                     cfg::tunnelBlockStatus = data.value("tunnelBlockStatus", "");
-
-                    // GUI Scanner
                     cfg::storageScanShow = data.value("sendGuiStorageScanner", false);
-
-                    // Crosshair
                     cfg::nightFxDraw = data.value("sendCrosshairDraw", false);
 
-                    // Player list
-                    if (data.contains("PLAYERS") && data["PLAYERS"].is_array()) {
+                    if (data.contains("PLAYERS") && data["PLAYERS"].is_array() && !cfg::freezePlayers) {
                         cfg::nearbyPlayers.clear();
 
                         for (const auto& playerJson : data["PLAYERS"]) {
@@ -633,19 +639,14 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                             if (playerJson.contains("armor") && playerJson["armor"].is_array()) {
                                 int idx = 0;
                                 for (const auto& armorPiece : playerJson["armor"]) {
-                                    if (idx >= 4) break; // Just 4 armor pieces expected
+                                    if (idx >= 4) break;
                                     if (armorPiece.is_string())
                                         pInfo.armor[idx++] = armorPiece.get<std::string>();
                                 }
-                                // If less than 4, remaining stay empty strings
-                                for (; idx < 4; idx++) {
+                                for (; idx < 4; idx++) 
                                     pInfo.armor[idx] = "";
-                                }
                             }
-                            else {
-                                // default empty armor
-                                pInfo.armor.fill("");
-                            }
+                            else pInfo.armor.fill("");
 
                             if (playerJson.contains("mainhand") && playerJson["mainhand"].is_string())
                                 pInfo.mainhand = playerJson["mainhand"].get<std::string>();
@@ -760,6 +761,9 @@ void saveSettings() {
 	config["nightFx"] = cfg::nightFx;
 	config["nightFxSize"] = cfg::nightFxSize;
 	config["nightFxCrosshairLines"] = cfg::nightFxCrosshairLines;
+	config["selfCrystal"] = cfg::selfCrystal;
+	config["selfCrystalDelay"] = cfg::selfCrystalDelay;
+	config["selfCrystalHumanity"] = cfg::selfCrystalHumanity;
 
     json blocksJson = json::array();
     for (const auto& block : cfg::espBlockList) {
@@ -851,6 +855,9 @@ void loadSettings() {
 		if (config.contains("nightFx")) cfg::nightFx = config["nightFx"].get<bool>();
 		if (config.contains("nightFxSize")) cfg::nightFxSize = config["nightFxSize"].get<float>();
 		if (config.contains("nightFxCrosshairLines")) cfg::nightFxCrosshairLines = config["nightFxCrosshairLines"].get<bool>();
+		if (config.contains("selfCrystal")) cfg::selfCrystal = config["selfCrystal"].get<bool>();
+		if (config.contains("selfCrystalDelay")) cfg::selfCrystalDelay = config["selfCrystalDelay"].get<int>();
+		if (config.contains("selfCrystalHumanity")) cfg::selfCrystalHumanity = config["selfCrystalHumanity"].get<int>();
 
 
         // Load ESP blocks

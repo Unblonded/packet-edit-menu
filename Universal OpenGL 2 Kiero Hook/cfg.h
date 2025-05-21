@@ -124,6 +124,9 @@ public:
     inline static float nightFxSize = 20.f;
     inline static bool nightFxDraw;
 	inline static bool nightFxCrosshairLines = true;
+	inline static bool selfCrystal = false;
+    inline static int selfCrystalDelay = 15;
+    inline static int selfCrystalHumanity = 3;
 
 
     inline static bool autoCrystalcfg;
@@ -140,6 +143,7 @@ public:
     inline static bool crystalSpamcfg;
     inline static bool nightFxcfg;
     inline static bool autoAnchorcfg;
+    inline static bool selfCrystalcfg;
 };
 
 static std::string getMinecraftFolder() {
