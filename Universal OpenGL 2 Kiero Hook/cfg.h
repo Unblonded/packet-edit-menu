@@ -80,6 +80,8 @@ public:
     inline static bool cancelInteraction = false;
     inline static bool showMenuInitialized;
     inline static bool autoAnchor = true;
+    inline static int autoAnchorDelay = 15;
+    inline static int autoAnchorHumanity = 3;
     inline static long long oreSimSeed = 6608149111735331168LL;
     inline static bool oreSim = false;
     inline static int oreSimDistance = 5;
@@ -137,6 +139,7 @@ public:
 	inline static bool storageScancfg;
     inline static bool crystalSpamcfg;
     inline static bool nightFxcfg;
+    inline static bool autoAnchorcfg;
 };
 
 static std::string getMinecraftFolder() {

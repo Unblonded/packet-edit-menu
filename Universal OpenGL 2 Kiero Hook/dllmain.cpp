@@ -10,7 +10,7 @@
 #include <Shlobj.h>
 #include <filesystem>
 #include "cfg.h"
-#include "IconsFontAwesome5.h"
+#include "IconsFontAwesome6.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -67,21 +67,23 @@ void RenderMain()
             {
                 ImGui::Checkbox(ICON_FA_GEM " Auto Crystal", &cfg::autoCrystal);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##crystal")) cfg::autoCrystalcfg = !cfg::autoCrystalcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##crystal")) cfg::autoCrystalcfg = !cfg::autoCrystalcfg;
 
-                ImGui::Checkbox(ICON_FA_SHIELD_ALT " Auto Totem", &cfg::autoTotem);
+                ImGui::Checkbox(ICON_FA_SHIELD_HALVED " Auto Totem", &cfg::autoTotem);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##totem")) cfg::autoTotemcfg = !cfg::autoTotemcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##totem")) cfg::autoTotemcfg = !cfg::autoTotemcfg;
 
                 ImGui::Checkbox(ICON_FA_BOMB " Auto Anchor", &cfg::autoAnchor);
+                ImGui::SameLine();
+                if (ImGui::Button(ICON_FA_GEARS "##anchor")) cfg::autoAnchorcfg = !cfg::autoAnchorcfg;
 
                 ImGui::Checkbox(ICON_FA_CROSSHAIRS " Aim Assist", &cfg::aimAssistToggle);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##aimAssist")) cfg::aimAssistcfg = !cfg::aimAssistcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##aimAssist")) cfg::aimAssistcfg = !cfg::aimAssistcfg;
 
                 ImGui::Checkbox(ICON_FA_BOMB " Crystal Spam", &cfg::crystalSpam);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##crystalspam")) cfg::crystalSpamcfg = !cfg::crystalSpamcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##crystalspam")) cfg::crystalSpamcfg = !cfg::crystalSpamcfg;
 
                 ImGui::EndTabItem();
             }
@@ -91,19 +93,19 @@ void RenderMain()
             {
                 ImGui::Checkbox(ICON_FA_TEXT_HEIGHT " Font Size Override", &cfg::fontSizeOverride);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##fontsize")) cfg::fontSizecfg = !cfg::fontSizecfg;
+                if (ImGui::Button(ICON_FA_GEARS "##fontsize")) cfg::fontSizecfg = !cfg::fontSizecfg;
 
                 ImGui::Checkbox(ICON_FA_USERS " Show Player List", &cfg::displayPlayers);
 
                 ImGui::Checkbox(ICON_FA_EYE " Advanced ESP", &cfg::advEsp);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##advesp")) cfg::advEspcfg = !cfg::advEspcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##advesp")) cfg::advEspcfg = !cfg::advEspcfg;
 
                 ImGui::Checkbox(ICON_FA_IMAGE " Show Background Effects", &cfg::backgroundFx);
 
 				ImGui::Checkbox(ICON_FA_STAR " Show Cosmic Crosshair", &cfg::nightFx);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##crosshair")) cfg::nightFxcfg = !cfg::nightFxcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##crosshair")) cfg::nightFxcfg = !cfg::nightFxcfg;
 
                 ImGui::EndTabItem();
             }
@@ -111,23 +113,23 @@ void RenderMain()
             // Utility Tab
             if (ImGui::BeginTabItem(ICON_FA_TOOLBOX " Utility"))
             {
-            	ImGui::Checkbox(ICON_FA_HAND_PAPER " Interaction Canceler", &cfg::cancelInteraction);
+            	ImGui::Checkbox(ICON_FA_HAND " Interaction Canceler", &cfg::cancelInteraction);
 
                 ImGui::Checkbox(ICON_FA_PLUG " Auto Disconnect", &cfg::autoDc);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##autodc")) cfg::autoDccfg = !cfg::autoDccfg;
+                if (ImGui::Button(ICON_FA_GEARS "##autodc")) cfg::autoDccfg = !cfg::autoDccfg;
 
                 ImGui::Checkbox(ICON_FA_DOLLAR_SIGN " Auto Sell", &cfg::autoSell);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##autosell")) cfg::autoSellcfg = !cfg::autoSellcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##autosell")) cfg::autoSellcfg = !cfg::autoSellcfg;
 
                 ImGui::Checkbox(ICON_FA_COMMENT_SLASH " Chat Filter", &cfg::chatFilter);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
+                if (ImGui::Button(ICON_FA_GEARS "##chatfilter")) cfg::chatFiltercfg = !cfg::chatFiltercfg;
 
                 ImGui::Checkbox(ICON_FA_BOX_OPEN " Storage Scan", &cfg::storageScan);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##storagescan")) cfg::storageScancfg = !cfg::storageScancfg;
+                if (ImGui::Button(ICON_FA_GEARS "##storagescan")) cfg::storageScancfg = !cfg::storageScancfg;
 
                 ImGui::EndTabItem();
             }
@@ -135,15 +137,15 @@ void RenderMain()
             // Mining & Economy Tab
             if (ImGui::BeginTabItem(ICON_FA_GEM " Mining"))
             {
-                ImGui::Checkbox(ICON_FA_HARD_HAT " Player Dig Safety", &cfg::checkPlayerAirSafety);
+                ImGui::Checkbox(ICON_FA_HELMET_SAFETY " Player Dig Safety", &cfg::checkPlayerAirSafety);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##digsafety")) cfg::checkPlayerAirSafetycfg = !cfg::checkPlayerAirSafetycfg;
+                if (ImGui::Button(ICON_FA_GEARS "##digsafety")) cfg::checkPlayerAirSafetycfg = !cfg::checkPlayerAirSafetycfg;
 
             	ImGui::Checkbox(ICON_FA_ROUTE " Straight Tunnel", &cfg::forwardTunnel);
 
                 ImGui::Checkbox(ICON_FA_SEEDLING " Seed-Ray", &cfg::oreSim);
                 ImGui::SameLine();
-                if (ImGui::Button(ICON_FA_COGS "##oresim")) cfg::oreSimcfg = !cfg::oreSimcfg;
+                if (ImGui::Button(ICON_FA_GEARS "##oresim")) cfg::oreSimcfg = !cfg::oreSimcfg;
 
                 ImGui::EndTabItem();
             }
@@ -157,6 +159,14 @@ void RenderMain()
         ImGui::End();
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
+
+        if (cfg::autoAnchorcfg) {
+            ImGui::Begin("Auto Anchor", &cfg::autoAnchorcfg);
+            ImGui::Text("Auto Anchor is %s", cfg::autoAnchor ? "enabled" : "disabled");
+            ImGui::SliderInt("Delay (ms)", &cfg::autoAnchorDelay, 1.0f, 50.f);
+            ImGui::SliderInt("Humanity (ms)", &cfg::autoAnchorHumanity, 1.0f, 50.f);
+            ImGui::End();
+        }
 
         if (cfg::nightFxcfg) {
 			ImGui::Begin("Cosmic Crosshair", &cfg::nightFxcfg);
@@ -522,6 +532,8 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 				config["crystalPlaceTime"] = cfg::crystalPlaceTime;
 				config["cancelInteraction"] = cfg::cancelInteraction;
 				config["autoAnchor"] = cfg::autoAnchor;
+                config["autoAnchorDelay"] = cfg::autoAnchorDelay;
+                config["autoAnchorHumanity"] = cfg::autoAnchorHumanity;
 				config["oreSim"] = cfg::oreSim;
 				config["oreSimSeed"] = cfg::oreSimSeed;
 				config["oreSimDistance"] = cfg::oreSimDistance;
@@ -707,6 +719,8 @@ void saveSettings() {
 	config["crystalPlaceTime"] = cfg::crystalPlaceTime;
 	config["cancelInteraction"] = cfg::cancelInteraction;
 	config["autoAnchor"] = cfg::autoAnchor;
+    config["autoAnchorDelay"] = cfg::autoAnchorDelay;
+    config["autoAnchorHumanity"] = cfg::autoAnchorHumanity;
 	config["oreSim"] = cfg::oreSim;
 	config["oreSimSeed"] = cfg::oreSimSeed;
 	config["oreSimDistance"] = cfg::oreSimDistance;
@@ -786,6 +800,8 @@ void loadSettings() {
 		if (config.contains("cancelInteraction")) cfg::cancelInteraction = config["cancelInteraction"].get<bool>();
 		if (config.contains("crystalPlaceTime")) cfg::crystalPlaceTime = config["crystalPlaceTime"].get<int>();
 		if (config.contains("autoAnchor")) cfg::autoAnchor = config["autoAnchor"].get<bool>();
+        if (config.contains("autoAnchorDelay")) cfg::autoAnchorDelay = config["autoAnchorDelay"].get<int>();
+        if (config.contains("autoAnchorHumanity")) cfg::autoAnchorHumanity = config["autoAnchorHumanity"].get<int>();
 		if (config.contains("oreSim")) cfg::oreSim = config["oreSim"].get<bool>();
 		if (config.contains("oreSimSeed")) cfg::oreSimSeed = config["oreSimSeed"].get<long long>();
 		if (config.contains("oreSimDistance")) cfg::oreSimDistance = config["oreSimDistance"].get<int>();
