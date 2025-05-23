@@ -10,6 +10,7 @@
 #include <Shlobj.h>
 #include <filesystem>
 #include "cfg.h"
+#include "console.h"
 #include "IconsFontAwesome6.h"
 
 using json = nlohmann::json;
@@ -40,6 +41,7 @@ void RenderMain()
 	else ImGui::GetIO().FontGlobalScale = cfg::fontSize;
 
     if (cfg::showMenu) {
+        console->draw();
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(
             neon_purple.x * pulse,
             neon_purple.y * pulse,
@@ -117,6 +119,8 @@ void RenderMain()
             // Utility Tab
             if (ImGui::BeginTabItem(ICON_FA_TOOLBOX " Utility"))
             {
+				ImGui::Checkbox(ICON_FA_CODE " Show Console", &console->show_console);
+
             	ImGui::Checkbox(ICON_FA_HAND " Interaction Canceler", &cfg::cancelInteraction);
 
                 ImGui::Checkbox(ICON_FA_PLUG " Auto Disconnect", &cfg::autoDc);
@@ -467,12 +471,14 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "[TCP] WSAStartup failed.\n";
+		console->log(console->COLOR_ERROR, "[TCP] WSAStartup failed.");
         return 1;
     }
 
     listenSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenSock == INVALID_SOCKET) {
         std::cerr << "[TCP] Failed to create socket.\n";
+		console->log(console->COLOR_ERROR, "[TCP] Failed to create socket.");
         WSACleanup();
         return 1;
     }
@@ -483,6 +489,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 
     if (bind(listenSock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
         std::cerr << "[TCP] Bind failed.\n";
+		console->log(console->COLOR_ERROR, "[TCP] Bind failed.");
         closesocket(listenSock);
         WSACleanup();
         return 1;
@@ -490,6 +497,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
 
     if (listen(listenSock, 1) == SOCKET_ERROR) {
         std::cerr << "[TCP] Listen failed.\n";
+		console->log(console->COLOR_ERROR, "[TCP] Listen failed.");
         closesocket(listenSock);
         WSACleanup();
         return 1;
@@ -500,12 +508,14 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
     clientSock = accept(listenSock, NULL, NULL);
     if (clientSock == INVALID_SOCKET) {
         std::cerr << "[TCP] Accept failed.\n";
+		console->log(console->COLOR_ERROR, "[TCP] Accept failed.");
         closesocket(listenSock);
         WSACleanup();
         return 1;
     }
 
     std::cout << "[TCP] Java client connected.\n";
+	console->log(console->COLOR_INFO, "[TCP] Java client connected.");
 
     char buffer[4096];
     std::string leftover;
@@ -513,10 +523,14 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
     while (!endloop) {
         int bytesReceived = recv(clientSock, buffer, sizeof(buffer) - 1, 0);
         if (bytesReceived <= 0) {
-            if (bytesReceived == 0)
+            if (bytesReceived == 0) {
                 std::cout << "[TCP] Client disconnected.\n";
-            else
+                console->log(console->COLOR_INFO, "[TCP] Client disconnected.");
+            }
+            else {
                 std::cerr << "[TCP] Recv error: " << WSAGetLastError() << "\n";
+				console->log(console->COLOR_ERROR, "[TCP] Recv error: %d", WSAGetLastError());
+            }
             break;
         }
 
@@ -681,6 +695,7 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                 }
                 catch (const std::exception& e) {
                     std::cerr << "[TCP] Failed to parse STATUS message: " << e.what() << "\n";
+					console->log(console->COLOR_ERROR, "[TCP] Failed to parse STATUS message: %s", e.what());
                 }
             }
             else if (message.find("autoDcPrimedDisable") != std::string::npos) {
@@ -689,10 +704,12 @@ DWORD WINAPI TCPThread(LPVOID lpParam) {
                     if (jsonStart != std::string::npos) {
                         json renderJson = json::parse(message.substr(jsonStart));
                         cfg::autoDcPrimed = renderJson.value("autoDcPrimedDisable", false);
+						console->log(console->COLOR_INFO, "[TCP] AutoDc primed status: %s", cfg::autoDcPrimed ? "enabled" : "disabled");
                     }
                 }
                 catch (const std::exception& e) {
-                    std::cerr << "[TCP] Failed to parse render flag: " << e.what() << "\n";
+                    std::cerr << "[TCP] Failed to parse flag: " << e.what() << "\n";
+					console->log(console->COLOR_ERROR, "[TCP] Failed to parse flag: %s", e.what());
                 }
 			}
         }

@@ -8,11 +8,15 @@
 #include <Shlobj.h>
 #include <fstream>
 #include <curl/curl.h>
+
+#include "console.h"
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "advapi32.lib")
+
+inline CyberpunkConsole* console = new CyberpunkConsole();
 
 #define IM_PI 3.14159265358979323846f
 

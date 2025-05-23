@@ -146,5 +146,8 @@
     <ClInclude Include="font_data.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="console.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
